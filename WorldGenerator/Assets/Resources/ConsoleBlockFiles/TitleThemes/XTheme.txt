@@ -1,0 +1,6 @@
+Title: Xsuma's theme
+Colors:
+	BackgroundTop: 41,41,41,0
+	BackgroundBottom: 115,102,159,0
+	TextGradientColor: 75,227,37,0
+	ParticleColor: 49,118,63,0

@@ -1,0 +1,11 @@
+Title: Main Color Theme
+Colors:
+	Main: 0,255,118,0
+	BackgroundTop: 248,25,113,0
+	BackgroundBottom: 20,197,182,0
+	BackgroundHueScale: 0.1
+	TextGradientColor: 53,39,229,0
+	ParticleColor: 236,91,184,0
+	ParticleHueScale: 0.01
+	CubeParticleColor1: 30,166,193,255
+	CubeParticleColor2: 60,38,233,255
