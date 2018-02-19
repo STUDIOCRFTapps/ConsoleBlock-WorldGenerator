@@ -325,7 +325,7 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
  </Reference>
  <Reference Include="TextMeshPro-1.0.55.2017.1.0b12">
- <HintPath>/Users/STUDIOCRAFT/WorldGenerator/Assets/TextMesh Pro/Plugins/TextMeshPro-1.0.55.2017.1.0b12.dll</HintPath>
+ <HintPath>/Users/STUDIOCRAFT/ConsoleBlock-WorldGenerator/WorldGenerator/Assets/TextMesh Pro/Plugins/TextMeshPro-1.0.55.2017.1.0b12.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

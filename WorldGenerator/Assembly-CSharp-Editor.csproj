@@ -252,10 +252,10 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
  </Reference>
  <Reference Include="TextMeshPro-1.0.55.2017.1.0b12">
- <HintPath>/Users/STUDIOCRAFT/WorldGenerator/Assets/TextMesh Pro/Plugins/TextMeshPro-1.0.55.2017.1.0b12.dll</HintPath>
+ <HintPath>/Users/STUDIOCRAFT/ConsoleBlock-WorldGenerator/WorldGenerator/Assets/TextMesh Pro/Plugins/TextMeshPro-1.0.55.2017.1.0b12.dll</HintPath>
  </Reference>
  <Reference Include="TextMeshPro-1.0.55.2017.1.0b12-Editor">
- <HintPath>/Users/STUDIOCRAFT/WorldGenerator/Assets/TextMesh Pro/Plugins/Editor/TextMeshPro-1.0.55.2017.1.0b12-Editor.dll</HintPath>
+ <HintPath>/Users/STUDIOCRAFT/ConsoleBlock-WorldGenerator/WorldGenerator/Assets/TextMesh Pro/Plugins/Editor/TextMeshPro-1.0.55.2017.1.0b12-Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>/Applications/Unity/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
