@@ -98,6 +98,7 @@ public class Chunk {
 
 	public void GenerateTerrainModels () {
 		if(ChunkObject == null || HeightMap == null || HeightMap.GetLength(0) == 0) {
+			Debug.Log("Error while trying to generate terrain assest");
 			return;
 		}
 
@@ -117,7 +118,7 @@ public class Chunk {
 				}
 				int stcId = Random.Range(0,worldM.biomes[cbiome].Structures.Structures.Length);
 				if(value < worldM.biomes[cbiome].Structures.Structures[stcId].StructureFrequency) {
-					if(HeightMap[x/BlockSize,y/BlockSize] > worldM.biomes[cbiome].Structures.Structures[stcId].MinSpawningHeight && HeightMap[x/BlockSize,y/BlockSize] < worldM.biomes[cbiome].Structures.Structures[stcId].MaxSpawningHeight) {
+					if(HeightMap[x/BlockSize,y/BlockSize]*BlockSize > worldM.biomes[cbiome].Structures.Structures[stcId].MinSpawningHeight && HeightMap[x/BlockSize,y/BlockSize] < worldM.biomes[cbiome].Structures.Structures[stcId].MaxSpawningHeight) {
 						int stcCode = Random.Range(0,worldM.biomes[cbiome].Structures.Structures[stcId].Objects.Length);
 						GameObject stc = (GameObject)GameObject.Instantiate(worldM.biomes[cbiome].Structures.Structures[stcId].Objects[stcCode],ChunkObject.transform.GetChild(0));
 						stc.transform.localPosition = new Vector3(x/BlockSize,HeightMap[x/BlockSize,y/BlockSize],y/BlockSize);
