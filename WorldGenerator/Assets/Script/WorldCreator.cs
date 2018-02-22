@@ -103,8 +103,8 @@ public class WorldCreator : MonoBehaviour {
 
 		for(int x = 0; x < WorldReferenceSize; x++) {
 			for(int y = 0; y < WorldReferenceSize; y++) {
-				TemperatureMap[x,y] = Mathf.Clamp01((ReferenceFalloffX.Evaluate((float)x/WorldReferenceSize)*0.95f)+(HeightMap[x,y]*0.15f));
-				HumidityMap[x,y] = Mathf.Clamp01((ReferenceFalloffY.Evaluate((float)y/WorldReferenceSize)*0.95f)+(HeightMap[x,y]*0.15f));
+				TemperatureMap[x,y] = Mathf.Clamp01((ReferenceFalloffX.Evaluate((float)x/WorldReferenceSize)*0.95f)+(HeightMap[x,y]*0.05f));
+				HumidityMap[x,y] = Mathf.Clamp01((ReferenceFalloffY.Evaluate((float)y/WorldReferenceSize)*0.95f)+(HeightMap[x,y]*0.05f));
 			}
 		}
 	}

@@ -106,7 +106,7 @@ public class WorldManager {
 						//Analize how similar the biome is to the environnement
 						Temperature = Distance(biomes[b].BiomeRequiredTemperature*0.01f,CT);
 						Humidity = Distance(biomes[b].BiomeRequiredHumidity*0.01f,CH);
-						BCurrentValue = (Temperature+Humidity)*(biomes[b].BiomeRarity*0.01f)/2f;
+						BCurrentValue = Mathf.Lerp(Temperature,Humidity,0.5f)*(biomes[b].BiomeRarity*0.01f);
 
 						AimAt = -1;
 						idv = 0;
@@ -267,7 +267,7 @@ public class WorldManager {
 
 	int Quality = 4;
 
-	//Get the height at a certain position (Biome interpolation based on "private void BiomeFactor()" in OTG - https://github.com/PG85/OpenTerrainGenerator/blob/1.10.2/common/src/main/java/com/khorn/terraincontrol/generator/ChunkProviderTC.java)
+	//Get the height at a certain position 
 	public float[] GetHeightMap(float x, float y) {
 
 		//Lock some code to prevent Thread Issues.
@@ -275,6 +275,7 @@ public class WorldManager {
 
 			float[] temp = new float[2];
 			List<int> bil = GetBiomesAt(x,y,1).infoList;
+			NaNError = biomes[bil[0]].name;
 
 			float BCurrentValue = 0f;
 
@@ -289,7 +290,7 @@ public class WorldManager {
 			//List<int> results = new List<int>();
 			//List<float> vresults = new List<float>();
 
-			//round this shit to the (biomes.Length*8) x/y center
+			//round this to the (biomes.Length*8) x/y center
 
 			for(int i = 0; i < bil.Count; i++) {
 
@@ -320,11 +321,11 @@ public class WorldManager {
 			res = ressv;*/
 
 			if(bil.Count == 1) {
-				temp = GetRawHeightMapBiomes(x,y,bil[0]);
+				temp[0] = (float)noiseGroup.GetNoiseValue(bil[0],new XnaGeometry.Vector2(x,y))*biomes[bil[0]].NoiseAmplitude + (biomes[bil[0]].BiomeMinHeight+biomes[bil[0]].BiomeSecondLifter);
 
 				float t1 = 1f;
 
-				NaNError = "1";
+				//NaNError = "1";
 				DebugNumbers[0] = 1;
 				DebugNumbers[1] = 0;
 				DebugNumbers[2] = 0;
@@ -332,7 +333,7 @@ public class WorldManager {
 				total = temp[0]*t1;
 			}
 			if(bil.Count == 2) {
-				temp = GetRawHeightMapBiomes(x,y,bil[0]);
+				temp[0] = (float)noiseGroup.GetNoiseValue(bil[0],new XnaGeometry.Vector2(x,y))*biomes[bil[0]].NoiseAmplitude + (biomes[bil[0]].BiomeMinHeight+biomes[bil[0]].BiomeSecondLifter);
 
 				float t1 = 0f;
 				float t2 = 0f;
@@ -352,19 +353,19 @@ public class WorldManager {
 				//t2 = (t2*0.5f)+0.5f;
 
 				//NaNError = t1 + " at " + bil[0] + ", " + t2 + " at " + bil[1];
-				NaNError = (Distance(res[1],res[0])*100f).ToString() + " & " + bil[0].ToString() + ";" + bil[1].ToString();
+				//NaNError = (Distance(res[1],res[0])*100f).ToString() + " & " + bil[0].ToString() + ";" + bil[1].ToString();
 				DebugNumbers[0] = t1;
 				DebugNumbers[1] = t2;
 				DebugNumbers[2] = 0;
 
 				total = temp[0]*t1;
-				total += GetRawHeightMapBiomes(x,y,bil[1])[0]*t2;
+				total += ((float)noiseGroup.GetNoiseValue(bil[1],new XnaGeometry.Vector2(x,y))*biomes[bil[1]].NoiseAmplitude+(biomes[bil[1]].BiomeMinHeight+biomes[bil[1]].BiomeSecondLifter))*t2;
 
 				//total = temp[0] * ((1f-Mathf.InverseLerp(0f,0.0053f,Mathf.Abs(res[0]-res[1]))) * 0.5f + 0.5f);
 				//total += GetRawHeightMapBiomes(x,y,bil[1],1)[0]*((Mathf.InverseLerp(0f,0.0053f,Mathf.Abs(res[0]-res[1])) * 0.5f + 0.5f));
 			}
 			if(bil.Count == 3) {
-				temp = GetRawHeightMapBiomes(x,y,bil[0]);
+				temp[0] = (float)noiseGroup.GetNoiseValue(bil[0],new XnaGeometry.Vector2(x,y))*biomes[bil[0]].NoiseAmplitude+(biomes[bil[0]].BiomeMinHeight+biomes[bil[0]].BiomeSecondLifter);
 
 				float t1 = 0f;
 				float t2 = 0f;
@@ -396,20 +397,20 @@ public class WorldManager {
 					t3 = 1f-(t1+t2);
 				}
 
-				NaNError = t1 + " at " + bil[0] + ", " + t2 + " at " + bil[1] + ", " + t3 + " at " + bil[2];
+				//NaNError = t1 + " at " + bil[0] + ", " + t2 + " at " + bil[1] + ", " + t3 + " at " + bil[2];
 				DebugNumbers[0] = t1;
 				DebugNumbers[1] = t2;
 				DebugNumbers[2] = t3;
 
 				total = temp[0]*t1;
-				total += GetRawHeightMapBiomes(x,y,bil[1])[0]*t2;
-				total += GetRawHeightMapBiomes(x,y,bil[2])[0]*t3;
+				total += (((float)noiseGroup.GetNoiseValue(bil[1],new XnaGeometry.Vector2(x,y))*biomes[bil[1]].NoiseAmplitude+(biomes[bil[1]].BiomeMinHeight)+biomes[bil[1]].BiomeSecondLifter))*t2;
+				total += (((float)noiseGroup.GetNoiseValue(bil[2],new XnaGeometry.Vector2(x,y))*biomes[bil[2]].NoiseAmplitude+(biomes[bil[2]].BiomeMinHeight)+biomes[bil[2]].BiomeSecondLifter))*t3;
 
 				//total = temp[0] * ((1f-Mathf.InverseLerp(0f,0.0053f,Mathf.Abs(res[0]-res[1]))) * 0.5f + 0.5f);
 				//total += GetRawHeightMapBiomes(x,y,bil[1],1)[0]*((Mathf.InverseLerp(0f,0.0053f,Mathf.Abs(res[0]-res[1])) * 0.5f + 0.5f));
 			}
 
-			temp[0] = total;
+			temp[0] = GetRawHeightMapBiomesModifier(x,y,total,bil[0])[0];//total;
 			return new float[2]{temp[0],temp[1]};
 		}
 	}
@@ -420,6 +421,7 @@ public class WorldManager {
 		float Height = 0f;
 		int blockId = -1;
 
+		//BIOME MIN HEIGHT REMOVED DUE TO TESTING
 		Height = ((biomes[CurrentBiome].BiomeMinHeight)+((float)noiseGroup.GetNoiseValue(CurrentBiome,new XnaGeometry.Vector2(x,y))*biomes[CurrentBiome].NoiseAmplitude));
 
 		if(biomes[CurrentBiome].UseRevertModule && biomes[CurrentBiome].RevertOrder == 0) {
@@ -469,11 +471,15 @@ public class WorldManager {
 			}
 		}
 
+		//BIOME MIN HEIGHT REMOVED DUE TO TESTING
 		Height += biomes[CurrentBiome].BiomeSecondLifter;
+		//Height -= biomes[CurrentBiome].BiomeMinHeight*0.75f;
 
 		if(biomes[CurrentBiome].UseSubBiomeModule) {
 			float HeightS = 0f;
 			int CurrentSBiome = biomes[CurrentBiome].SubBiomeId;
+
+			//BIOME MIN HEIGHT REMOVED DUE TO TESTING
 			HeightS = ((subBiomes[CurrentSBiome].BiomeMinHeight)+((float)noiseGroup.GetNoiseValue(CurrentSBiome+MainBiomeNoiseLength,new XnaGeometry.Vector2(x,y))*subBiomes[CurrentSBiome].NoiseAmplitude));
 
 			if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 0) {
@@ -527,7 +533,9 @@ public class WorldManager {
 				}
 			}
 
+			//BIOME MIN HEIGHT REMOVED DUE TO TESTING
 			HeightS += subBiomes[CurrentSBiome].BiomeSecondLifter;
+			//HeightS -= subBiomes[CurrentSBiome].BiomeMinHeight*0.75f;
 
 			if(biomes[CurrentBiome].SubBiomePassHeights) {
 				if(!biomes[CurrentBiome].SubBiomeRevert) {
@@ -564,6 +572,164 @@ public class WorldManager {
 		}
 		return new float[2]{Height,blockId};
 	}
+
+	public float[] GetRawHeightMapBiomesModifier(float x, float y, float NoiseValue, int biome) { //Need a amplified noise
+		int CurrentBiome = biome;
+		float Height = 0f;
+		int blockId = -1;
+
+		//BIOME MIN HEIGHT REMOVED DUE TO TESTING
+		Height = NoiseValue;
+
+		if(biomes[CurrentBiome].UseRevertModule && biomes[CurrentBiome].RevertOrder == 0) {
+			if(Height >= biomes[CurrentBiome].RevertHeight) {
+				Height = Revert(biomes[CurrentBiome].revertMode,Height,CurrentBiome);
+			}
+		}
+
+		if(biomes[CurrentBiome].UseStrechModule) {
+			float HighLimit = (biomes[CurrentBiome].StretchMinimumHeight) + Mathf.PerlinNoise(x*0.01f,y*0.01f) * 5f;
+			Height = Mathf.Lerp(Height,HighLimit+((Height-HighLimit)*AmpliCurve(Mathf.InverseLerp(HighLimit,biomes[CurrentBiome].StretchMaxHeight,Height),biomes[CurrentBiome].StretchMaxSlopeFactor)),biomes[CurrentBiome].StretchModuleInfluence);
+		}
+
+		if(biomes[CurrentBiome].UseRevertModule && biomes[CurrentBiome].RevertOrder == 1) {
+			if(Height >= biomes[CurrentBiome].RevertHeight) {
+				Height = Revert(biomes[CurrentBiome].revertMode,Height,CurrentBiome);
+			}
+		}
+
+		if(biomes[CurrentBiome].UseCliffModule) {
+			float CliffRange = biomes[CurrentBiome].CliffRange/2f;
+			float Limit = biomes[CurrentBiome].CliffBottom - Mathf.PerlinNoise(x*0.01f,y*0.01f)*5f;
+			if(Height >= Limit - CliffRange && Height < Limit + CliffRange) {
+				float LerpPos = Mathf.InverseLerp(Limit - CliffRange, Limit + CliffRange,Height);
+				Height = Mathf.SmoothStep(Height,Height+biomes[CurrentBiome].CliffHeight,LerpPos);
+			} else if(Height >= Limit + CliffRange) {
+				Height = Height+biomes[CurrentBiome].CliffHeight;
+			}
+		}
+
+		if(biomes[CurrentBiome].UseRevertModule && biomes[CurrentBiome].RevertOrder == 2) {
+			if(Height >= biomes[CurrentBiome].RevertHeight) {
+				Height = Revert(biomes[CurrentBiome].revertMode,Height,CurrentBiome);
+			}
+		}
+
+		if(biomes[CurrentBiome].UseCanyonModule) {
+			if(Height > biomes[CurrentBiome].CanyonStartingHeight) {
+				float StepHeight = (Height-biomes[CurrentBiome].CanyonStartingHeight)*biomes[CurrentBiome].CanyonStepCurveFactor;
+				Height = biomes[CurrentBiome].CanyonStartingHeight + ((Mathf.Floor(StepHeight) + biomes[CurrentBiome].CanyonCurve.Evaluate(Mathf.Repeat(StepHeight,1)))*biomes[CurrentBiome].CanyonStepHeight);
+			}
+		}
+
+		if(biomes[CurrentBiome].UseRevertModule && biomes[CurrentBiome].RevertOrder == 3) {
+			if(Height >= biomes[CurrentBiome].RevertHeight) {
+				Height = Revert(biomes[CurrentBiome].revertMode,Height,CurrentBiome);
+			}
+		}
+
+		//BIOME MIN HEIGHT REMOVED DUE TO TESTING
+		//Height += biomes[CurrentBiome].BiomeSecondLifter;
+		//Height -= biomes[CurrentBiome].BiomeMinHeight*0.75f;
+
+		if(biomes[CurrentBiome].UseSubBiomeModule) {
+			float HeightS = 0f;
+			int CurrentSBiome = biomes[CurrentBiome].SubBiomeId;
+
+			//BIOME MIN HEIGHT REMOVED DUE TO TESTING
+			HeightS = ((subBiomes[CurrentSBiome].BiomeMinHeight)+((float)noiseGroup.GetNoiseValue(CurrentSBiome+MainBiomeNoiseLength,new XnaGeometry.Vector2(x,y))*subBiomes[CurrentSBiome].NoiseAmplitude));
+
+			if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 0) {
+				if(HeightS >= subBiomes[CurrentSBiome].RevertHeight) {
+					HeightS = Revert(subBiomes[CurrentSBiome].revertMode,Height,CurrentBiome);
+				}
+			}
+
+			if(subBiomes[CurrentSBiome].UseStrechModule) {
+				float HighLimit = (subBiomes[CurrentSBiome].StretchMinimumHeight) + Mathf.PerlinNoise(x*0.01f,y*0.01f) * 5f;
+				HeightS = Mathf.Lerp(HeightS,HighLimit+((HeightS-HighLimit)*AmpliCurve(Mathf.InverseLerp(HighLimit,subBiomes[CurrentSBiome].StretchMaxHeight,HeightS),subBiomes[CurrentSBiome].StretchMaxSlopeFactor)),subBiomes[CurrentSBiome].StretchModuleInfluence);
+			}
+
+			if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 1) {
+				if(HeightS >= subBiomes[CurrentSBiome].RevertHeight) {
+					HeightS = Revert(subBiomes[CurrentSBiome].revertMode,HeightS,CurrentBiome);
+				}
+			}
+
+			if(subBiomes[CurrentSBiome].UseCliffModule) {
+				float CliffRange = subBiomes[CurrentSBiome].CliffRange/2f;
+				float Limit = subBiomes[CurrentSBiome].CliffBottom - Mathf.PerlinNoise(x*0.01f,y*0.01f)*5f;
+				if(HeightS >= Limit - CliffRange && HeightS < Limit + CliffRange) {
+					float LerpPos = Mathf.InverseLerp(Limit - CliffRange, Limit + CliffRange,HeightS);
+					HeightS = Mathf.SmoothStep(HeightS,HeightS+subBiomes[CurrentSBiome].CliffHeight,LerpPos);
+				} else if(HeightS >= Limit + CliffRange) {
+					HeightS = HeightS+subBiomes[CurrentSBiome].CliffHeight;
+				}
+			}
+
+			if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 2) {
+				if(HeightS >= subBiomes[CurrentSBiome].RevertHeight) {
+					HeightS = Revert(subBiomes[CurrentSBiome].revertMode,HeightS,CurrentBiome);
+				}
+			}
+
+			if(subBiomes[CurrentSBiome].UseCanyonModule) {
+				if(HeightS > subBiomes[CurrentSBiome].CanyonStartingHeight && !(HeightS < subBiomes[CurrentSBiome].CanyonMaxHeight)) {
+					float StepHeight = (HeightS-subBiomes[CurrentSBiome].CanyonStartingHeight)*subBiomes[CurrentSBiome].CanyonStepCurveFactor;
+					HeightS = subBiomes[CurrentSBiome].CanyonStartingHeight + ((Mathf.Floor(StepHeight) + subBiomes[CurrentSBiome].CanyonCurve.Evaluate(Mathf.Repeat(StepHeight,1)))*biomes[CurrentBiome].CanyonStepHeight);
+				} else if(HeightS < subBiomes[CurrentSBiome].CanyonMaxHeight) {
+					float StepHeight = (HeightS-subBiomes[CurrentSBiome].CanyonStartingHeight)*subBiomes[CurrentSBiome].CanyonStepCurveFactor;
+					float MaxSH = subBiomes[CurrentSBiome].CanyonStartingHeight+Mathf.Floor((HeightS-subBiomes[CurrentSBiome].CanyonStartingHeight)/StepHeight)*StepHeight;
+					HeightS = MaxSH+Height-MaxSH;
+				}
+			}
+
+			if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 3) {
+				if(HeightS >= subBiomes[CurrentSBiome].RevertHeight) {
+					HeightS = Revert(subBiomes[CurrentSBiome].revertMode,HeightS,CurrentBiome);
+				}
+			}
+
+			//BIOME MIN HEIGHT REMOVED DUE TO TESTING
+			HeightS += subBiomes[CurrentSBiome].BiomeSecondLifter;
+			//HeightS -= subBiomes[CurrentSBiome].BiomeMinHeight*0.75f;
+
+			if(biomes[CurrentBiome].SubBiomePassHeights) {
+				if(!biomes[CurrentBiome].SubBiomeRevert) {
+					if(Height < HeightS) {
+						Height = HeightS;
+						blockId = subBiomes[CurrentSBiome].GroundBlock;
+
+						if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 4) {
+							if(HeightS > subBiomes[CurrentSBiome].RevertHeight) {
+								HeightS = Revert(subBiomes[CurrentSBiome].revertMode,HeightS,CurrentBiome);
+							}
+						}
+					}
+				} else {
+					if(Height > HeightS) {
+						//Height = HeightS;
+						blockId = subBiomes[CurrentSBiome].GroundBlock;
+
+						if(subBiomes[CurrentSBiome].UseRevertModule && subBiomes[CurrentSBiome].RevertOrder == 4) {
+							Height = RevertLastStepSubbiome(subBiomes[CurrentSBiome].revertMode,Height,HeightS,CurrentSBiome);
+						} else {
+							Height = HeightS;
+						}
+					}
+				}
+			} else {
+				Height = Mathf.Lerp(Height, HeightS, biomes[CurrentBiome].SubBiomeModuleForce);
+			}
+		}
+
+		//Height = Mathf.Round(Height)+0.08f; Felling Minecrafty? Uncomment this line!
+		if(blockId == -1) {
+			blockId = biomes[CurrentBiome].GroundBlock;
+		}
+		return new float[2]{Height,blockId};
+	}
+
 
 	float RevertLastStepSubbiome (Biome.RevertMode revertM, float Height, float HeightS, int BiomeId) {
 		switch(revertM) {

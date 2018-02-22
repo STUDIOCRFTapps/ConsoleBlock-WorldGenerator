@@ -158,7 +158,7 @@ public class WorldLoader : MonoBehaviour {
 		//Debugging
 		if(!IsUpdatingCollision) {
 			StartCoroutine(UpdateCollision());
-			//DebugingText[0].text = worldManager.NaNError;
+			DebugingText[0].text = worldManager.NaNError;
 			DebugingImages[0].fillAmount = worldManager.DebugNumbers[0];
 			DebugingImages[1].fillAmount = worldManager.DebugNumbers[1];
 			DebugingImages[2].fillAmount = worldManager.DebugNumbers[2];
