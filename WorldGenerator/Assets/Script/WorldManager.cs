@@ -8,11 +8,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 using OTNM;
 using OTNM.Tools;
+using FastNoiseLibrary;
 
 //Manage the world by giving height (noise) and block (id) information, creating noise, giving water height information.
 public class WorldManager {
 
 	public float BiomeTransitionSmoothing = 0.00185f;
+	FastNoise fn;
 
 	public float Multiplicator = 4.0f;
 	public float Divisor =  8.0f;
@@ -71,6 +73,7 @@ public class WorldManager {
 		biomes = biomesBlueprint;
 		subBiomes = subBiomesBlueprint;
 		creator = worldCreator;
+		fn = new FastNoise(0); //NEED A SEED
 
 		//Directory.CreateDirectory(Application.persistentDataPath + "/res/");
 		//File.WriteAllText(Application.persistentDataPath + "/res/bakedbiomedata.dat","HEya?");
@@ -274,8 +277,38 @@ public class WorldManager {
 		lock(thisLock) {
 
 			float[] temp = new float[2];
-			List<int> bil = GetBiomesAt(x,y,1).infoList;
-			NaNError = biomes[bil[0]].name;
+			List<int> bil;
+			if(!creator.loader.DebuggingMode) {
+				bil = GetBiomesAt(x,y,1).infoList;
+				NaNError = biomes[bil[0]].name;
+			} else {
+				//Add min height
+				float Frequency = Mathf.Lerp(0.00003f, 0.009f, Mathf.PerlinNoise(x*0.0001f,y*0.0001f));
+				float Amplitude = Mathf.Lerp(10, 500, Mathf.PerlinNoise(x*0.00001f,y*0.00001f));
+				float Lacunarity = Mathf.Lerp(5f, 9f, Mathf.PerlinNoise(x*0.00024f,y*0.00024f));
+				float Gain = Mathf.Lerp(0.013f, 0.25f, Mathf.PerlinNoise(x*0.00028f,y*0.00028f));
+				float NoiseTypeValue = Mathf.Lerp(-1f, 1f, Mathf.SmoothStep(0,1f,Mathf.PerlinNoise(x*0.00005f,y*0.00005f)));
+				XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetFractalNoiseWType(new XnaGeometry.Vector2(x*Frequency,y*Frequency),new Accessing.NoiseParameters(5,Lacunarity,Gain),fn,NoiseTypeValue)*Amplitude;
+
+
+				/*float hillMinHeight = Mathf.Lerp(10, 90, Mathf.PerlinNoise(x*0.00013f,y*0.00013f));//Amplitude*0.75f;
+				if(temp[0] > hillMinHeight) {
+					float hillMaxHeight = 50;//Amplitude*0.75f+5f;
+					float hillHeight = Mathf.Lerp(1f, 90f, Mathf.PerlinNoise(x*0.015f,y*0.015f));
+
+					if(temp[0] > hillMinHeight+hillMaxHeight) {
+						temp[0] = temp[0]+hillHeight;
+					} else {
+						temp[0] = Mathf.SmoothStep(hillMinHeight,hillMinHeight+hillMaxHeight+hillHeight,Mathf.InverseLerp(hillMinHeight,hillMinHeight+hillMaxHeight,temp[0]));
+					}
+				}*/
+				temp[0] = OTNM.Tools.Accessing.Erode(n);
+				temp[1] = 0;
+
+				//temp = GetRawHeightMapBiomes(x,y,114);
+				//temp[0] = (temp[0]-Mathf.Repeat(temp[0],biomes[114].CanyonStepHeight))+(biomes[114].CanyonCurve.Evaluate(Mathf.Repeat(temp[0],biomes[114].CanyonStepHeight)/biomes[114].CanyonStepHeight)*biomes[114].CanyonStepHeight);
+				return temp;
+			}
 
 			float BCurrentValue = 0f;
 
@@ -777,7 +810,7 @@ public class WorldManager {
 	public float[,] GetWorldHeight (int chunkX, int chunkY, int blockInterval) {
 		string FileDirectory = creator.loader.WorldDirectoryPath + Path.DirectorySeparatorChar + (chunkX.ToString() + "_" + chunkY.ToString()) + ".cbc"; //cbc: ConsoleBlock Chunk
 
-		if(File.Exists(FileDirectory)) {
+		if(File.Exists(FileDirectory) && !creator.loader.DebuggingMode) {
 			byte[] feed = Decompress(File.ReadAllBytes(FileDirectory));
 			float[,] results = new float[creator.loader.SimulatedChunkSize/blockInterval+1,creator.loader.SimulatedChunkSize/blockInterval+1];
 

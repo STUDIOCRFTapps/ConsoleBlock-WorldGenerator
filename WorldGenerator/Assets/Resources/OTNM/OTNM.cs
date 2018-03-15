@@ -48,7 +48,6 @@ namespace OTNM {
 			}
 		}
 	}
-
 	public class TerrainNoise {
 		TerrainType terrainType = TerrainType.SimplexNoise;
 		public int seed;
@@ -260,6 +259,39 @@ namespace OTNM.Tools {
 		public static float GetNoise(Vector2 p, FastNoise noise, int seed = 0) {
 			noise.SetSeed(seed);
 			return noise.GetSimplex(p.x,p.y);
+		}
+
+		public static float Erode (Vector3 Value) {
+			return Value.x-=(MathFunc.Pow(Vector2.Dot(Value.y,Value.z),2f));
+		}
+
+		public static Vector3 GetFractalNoiseWType(Vector2 p, NoiseParameters noiseParameters, FastNoise noise, float NType, int seed = 0) {
+			//Type: Value from -1 (Rigged) to 1 (Billow)
+			//Original noise values are ranging from -1 to 1
+
+			Vector3 sum = Vector3.Zero;
+			float freq = 1.0f, amp = 1.0f;
+			Vector2 dsum = new Vector2(0,0);
+			for(int i = 0; i < noiseParameters.octaves; i++) {
+				Vector3 n = GetDerivativePerlinNoise(p*freq,noise,seed+i);
+				n.x = MathFunc.PingPong(n.x+NType,1);
+				n.y = MathFunc.PingPong(n.y+NType,1);
+				n.z = MathFunc.PingPong(n.z+NType,1);
+				//n.x = 1f-MathFunc.PingPong(n.x,0.5f)*2f;
+				//n.y = 1f-MathFunc.PingPong(n.y,0.5f)*2f;
+				//n.z = 1f-MathFunc.PingPong(n.z,0.5f)*2f;
+				//n.x = MathFunc.Pow(n.x,2);
+
+				dsum += new Vector2(n.y,n.z);
+				sum.x += amp * n.x / (1 + Vector2.Dot(dsum, dsum));
+
+				sum.y += n.y*amp;
+				sum.z += n.z*amp;
+
+				freq *= noiseParameters.lacunarity;
+				amp *= noiseParameters.gain;
+			}
+			return sum;
 		}
 
 		public static float GetFractalNoise(Vector2 p, NoiseParameters noiseParameters, FastNoise noise, int seed = 0) {

@@ -101,6 +101,9 @@ public class Chunk {
 			Debug.Log("Error while trying to generate terrain assest");
 			return;
 		}
+		if(worldM.creator.loader.DebuggingMode) {
+			return;
+		}
 
 		//Remove current assets
 		var children = new List<GameObject>();

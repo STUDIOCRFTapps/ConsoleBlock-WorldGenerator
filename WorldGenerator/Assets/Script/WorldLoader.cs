@@ -20,6 +20,7 @@ public class WorldLoader : MonoBehaviour {
 
 	public Text[] DebugingText;
 	public Image[] DebugingImages;
+	public bool DebuggingMode = false;
 
 	public Transform[] Colliders;
 
@@ -89,7 +90,9 @@ public class WorldLoader : MonoBehaviour {
 		//Initialize a bunch of stuff
 		NewChunkPos = new Vector2(Mathf.Floor(Player.position.x/SimulatedChunkSize),Mathf.Floor(Player.position.z/SimulatedChunkSize));
 		OldChunkPos = NewChunkPos;
-		worldCreator.Execute();
+		if(!DebuggingMode) {
+			worldCreator.Execute();
+		}
 		PlayerBody = Player.GetComponent<Rigidbody>();
 		worldManager = new WorldManager(worldCreator,biomes,subBiome);
 		worldManager.BiomeTransitionSmoothing = BiomeTransitionSmoothing;

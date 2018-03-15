@@ -45,7 +45,7 @@ public class WorldCreator : MonoBehaviour {
 		/*if(Input.GetKeyDown(KeyCode.Return)) {
 			Execute();
 		}*/
-		if(t) {
+		if(t && !loader.DebuggingMode) {
 			if(DisplayMaterial != null) {
 				Color[] col = new Color[loader.biomes.Length];
 				for(int i = 0; i < loader.biomes.Length; i++) {
