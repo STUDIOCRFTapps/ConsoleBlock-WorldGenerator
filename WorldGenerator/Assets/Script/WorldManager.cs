@@ -283,12 +283,25 @@ public class WorldManager {
 				NaNError = biomes[bil[0]].name;
 			} else {
 				//Add min height
-				float Frequency = Mathf.Lerp(0.00003f, 0.009f, Mathf.PerlinNoise(x*0.0001f,y*0.0001f));
-				float Amplitude = Mathf.Lerp(10, 500, Mathf.PerlinNoise(x*0.00001f,y*0.00001f));
-				float Lacunarity = Mathf.Lerp(5f, 9f, Mathf.PerlinNoise(x*0.00024f,y*0.00024f));
-				float Gain = Mathf.Lerp(0.013f, 0.25f, Mathf.PerlinNoise(x*0.00028f,y*0.00028f));
-				float NoiseTypeValue = Mathf.Lerp(-1f, 1f, Mathf.SmoothStep(0,1f,Mathf.PerlinNoise(x*0.00005f,y*0.00005f)));
-				XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetFractalNoiseWType(new XnaGeometry.Vector2(x*Frequency,y*Frequency),new Accessing.NoiseParameters(5,Lacunarity,Gain),fn,NoiseTypeValue)*Amplitude;
+
+				//float Distorsion = Mathf.Lerp(0.00009f, 0.00016f, Mathf.PerlinNoise(x*0.000212f,y*0.000212f));
+				//float Frequency = Mathf.Lerp(0.002f, 0.001f, Mathf.PerlinNoise(x*Distorsion,y*Distorsion));
+				float Frequency = Mathf.Lerp(0.1f, 0.2f, Mathf.PerlinNoise(x,y));
+
+				float Amplitude = Mathf.Lerp(10, 900, Mathf.PerlinNoise(x*0.00001f,y*0.00001f));
+				float Lacunarity = Mathf.Lerp(6f, 9f, Mathf.PerlinNoise(x*0.00024f,y*0.00024f));
+
+				float AltitudeErosion = 0f;//Mathf.Lerp(0.05f, 0.95f, Mathf.PerlinNoise(x*0.00029f,y*0.00029f));
+				float RidgeErosion = 1;//Mathf.Lerp(0.8f, 1.2f, Mathf.PerlinNoise(x*0.00031f,y*0.00031f));
+				float SlopeErosion = 1;//Mathf.Lerp(0.8f, 1.2f, Mathf.PerlinNoise(x*0.00032f,y*0.00032f));
+
+				float Gain = Mathf.Lerp(0.063f, 0.25f, Mathf.PerlinNoise(x*0.00028f,y*0.00028f));
+
+				float Sharpness = 0.5f;//Mathf.Lerp(0f, 1f, Mathf.SmoothStep(0,1f,Mathf.PerlinNoise(x*0.00005f,y*0.00005f)));
+				float FeatureAmplifier = 0f;//Mathf.Lerp(0f, 0.09f, Mathf.PerlinNoise(x*0.0043f,y*0.0043f));
+
+				XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetUberNoise(new XnaGeometry.Vector2(x*Frequency,y*Frequency),fn,0,5,Sharpness,FeatureAmplifier,AltitudeErosion,RidgeErosion,SlopeErosion,Lacunarity,Gain);
+				//XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetFractalNoiseWType(new XnaGeometry.Vector2(x*Frequency,y*Frequency),new Accessing.NoiseParameters(5,Lacunarity,Gain),fn,NoiseTypeValue)*Amplitude;
 
 
 				/*float hillMinHeight = Mathf.Lerp(10, 90, Mathf.PerlinNoise(x*0.00013f,y*0.00013f));//Amplitude*0.75f;
@@ -302,7 +315,7 @@ public class WorldManager {
 						temp[0] = Mathf.SmoothStep(hillMinHeight,hillMinHeight+hillMaxHeight+hillHeight,Mathf.InverseLerp(hillMinHeight,hillMinHeight+hillMaxHeight,temp[0]));
 					}
 				}*/
-				temp[0] = OTNM.Tools.Accessing.Erode(n);
+				temp[0] = Mathf.Lerp(-400, 400, Mathf.PerlinNoise(x*0.000093f,y*0.000093f))+OTNM.Tools.Accessing.Erode(n);
 				temp[1] = 0;
 
 				//temp = GetRawHeightMapBiomes(x,y,114);

@@ -262,35 +262,57 @@ namespace OTNM.Tools {
 		}
 
 		public static float Erode (Vector3 Value) {
-			return Value.x-=(MathFunc.Pow(Vector2.Dot(Value.y,Value.z),2f));
+			//return Value.x-=(MathFunc.Pow(MathFunc.Clamp(Math.Abs(Value.y)+Math.Abs(Value.z),0,2),3f)*12f);
+			return Value.x;
 		}
 
-		public static Vector3 GetFractalNoiseWType(Vector2 p, NoiseParameters noiseParameters, FastNoise noise, float NType, int seed = 0) {
+		public static Vector3 GetUberNoise(Vector2 p, FastNoise noise, int seed, 
+			int lOctaves,
+			//float lPerturbFeatures,
+			float lSharpness,
+			float lFeaturesAmplifier,
+			float lAltitudeErosion,
+			float lRidgeErosion,
+			float lSlopeErosion,
+			float lLacunarity,
+			float lGain
+		) {
 			//Type: Value from -1 (Rigged) to 1 (Billow)
 			//Original noise values are ranging from -1 to 1
 
 			Vector3 sum = Vector3.Zero;
-			float freq = 1.0f, amp = 1.0f;
+			float freq = 1.0f, amp = 1.0f, damp = 1.0f;
 			Vector2 dsum = new Vector2(0,0);
-			for(int i = 0; i < noiseParameters.octaves; i++) {
-				Vector3 n = GetDerivativePerlinNoise(p*freq,noise,seed+i);
-				n.x = MathFunc.PingPong(n.x+NType,1);
-				n.y = MathFunc.PingPong(n.y+NType,1);
-				n.z = MathFunc.PingPong(n.z+NType,1);
-				//n.x = 1f-MathFunc.PingPong(n.x,0.5f)*2f;
-				//n.y = 1f-MathFunc.PingPong(n.y,0.5f)*2f;
-				//n.z = 1f-MathFunc.PingPong(n.z,0.5f)*2f;
-				//n.x = MathFunc.Pow(n.x,2);
+			Vector2 rdsum = new Vector2(0,0);
 
-				dsum += new Vector2(n.y,n.z);
-				sum.x += amp * n.x / (1 + Vector2.Dot(dsum, dsum));
+			for(int i = 0; i < lOctaves; i++) {
+				Vector3 nround = GetDerivativePerlinNoise(p*freq,noise,seed+i);
+				Vector3 nsharp = nround;
+				Vector3 n;
+
+				nround.x = MathFunc.PingPong(nround.x-0.5f,1);
+				nround.y = MathFunc.PingPong(nround.y-0.5f,1);
+				nround.z = MathFunc.PingPong(nround.z-0.5f,1);
+				nsharp.x = MathFunc.PingPong(nsharp.x+0.5f,1);
+				nsharp.y = MathFunc.PingPong(nsharp.y+0.5f,1);
+				nsharp.z = MathFunc.PingPong(nsharp.z+0.5f,1);
+
+				n = Vector3.Lerp(nround,nsharp,lSharpness);
+
+				dsum += new Vector2(n.y*lSlopeErosion,n.z*lSlopeErosion);
+				sum.x += damp * n.x / (1 + Vector2.Dot(dsum, dsum));
 
 				sum.y += n.y*amp;
 				sum.z += n.z*amp;
+				sum.y *= 0.5f;
+				sum.z *= 0.5f;
 
-				freq *= noiseParameters.lacunarity;
-				amp *= noiseParameters.gain;
+				freq *= lLacunarity;
+				amp *= MathFunc.Lerp(lGain, lGain * MathFunc.SmoothStep(0.0f,1.0f,sum.x), lAltitudeErosion);
+				damp = amp * (1.0f - (lRidgeErosion / (1.0f + Vector2.Dot(rdsum,rdsum))));
+				lGain += lFeaturesAmplifier;
 			}
+
 			return sum;
 		}
 
