@@ -20,10 +20,10 @@ MonoBehaviour:
     y: 30
     width: 1366
     height: 628
-  m_MinSize: {x: 583, y: 342}
-  m_MaxSize: {x: 12008, y: 8042}
+  m_MinSize: {x: 583, y: 492}
+  m_MaxSize: {x: 14004, y: 14042}
   vertical: 0
-  controlID: 138
+  controlID: 123
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -120,8 +120,8 @@ MonoBehaviour:
     y: 0
     width: 983
     height: 628
-  m_MinSize: {x: 306, y: 342}
-  m_MaxSize: {x: 8006, y: 8042}
+  m_MinSize: {x: 306, y: 492}
+  m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
   controlID: 27
 --- !u!114 &4
@@ -201,9 +201,9 @@ MonoBehaviour:
     height: 335
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 18350000
-    m_LastClickedID: 13592
-    m_ExpandedIDs: 5295f8ff9a02faffa602faff1afcffff00000000
+    m_SelectedIDs: 52350000
+    m_LastClickedID: 13650
+    m_ExpandedIDs: 1afcffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -283,14 +283,14 @@ MonoBehaviour:
     width: 671
     height: 335
   m_SceneLighting: 1
-  lastFramingTime: 139009.75980591774
+  lastFramingTime: 70185.56673502922
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 16487.547, y: 27.300804, z: 16480.45}
+    m_Target: {x: 4096, y: 400, z: 4096}
     speed: 2
-    m_Value: {x: 16487.547, y: 27.300804, z: 16480.45}
+    m_Value: {x: 4096, y: 400, z: 4096}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -313,13 +313,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.31897673, y: 0.4541567, z: 0.17828809, w: -0.8125324}
+    m_Target: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
     speed: 2
-    m_Value: {x: 0.31897673, y: 0.4541567, z: 0.17828809, w: -0.8125324}
+    m_Value: {x: 0.70710677, y: 0, z: -0, w: -0.70710677}
   m_Size:
-    m_Target: 0.040515482
+    m_Target: 698.25555
     speed: 2
-    m_Value: 0.040515482
+    m_Value: 698.25555
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -482,17 +482,17 @@ MonoBehaviour:
     y: 356
     width: 983
     height: 272
-  m_MinSize: {x: 102, y: 121}
-  m_MaxSize: {x: 4002, y: 4021}
-  m_ActualView: {fileID: 15}
+  m_MinSize: {x: 232, y: 271}
+  m_MaxSize: {x: 10002, y: 10021}
+  m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
   - {fileID: 15}
   - {fileID: 16}
   - {fileID: 17}
   - {fileID: 18}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &14
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -531,19 +531,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Resources/ConsoleBlockFiles/Biomes
+    - Assets/Script
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources/ConsoleBlockFiles/Biomes
+  - Assets/Script
   m_LastFoldersGridSize: -1
   m_LastProjectPath: /Users/STUDIOCRAFT/ConsoleBlock-WorldGenerator/WorldGenerator
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 539.5742}
-    m_SelectedIDs: 322e0000
-    m_LastClickedID: 11826
-    m_ExpandedIDs: 0000000050290000502a00007c2a00005a2b0000d42b00002c2d0000882d0000c82d00002a2e0000422e00004c2e0000ac2e0000ee2e00003c300000aa300000ae310000e2310000bc32000010330000143300001c3300007e330000ac33000028340000cc390000ce390000d0390000d2390000d4390000d63900005e3b0000ffffff7f
+    scrollPos: {x: 0, y: 470}
+    m_SelectedIDs: b82a0000
+    m_LastClickedID: 10936
+    m_ExpandedIDs: 0000000050290000502a00007c2a00005c2b0000dc2b0000342d0000942d0000d42d0000382e0000502e00005a2e0000fe2e00004e300000c4300000d03100000c320000e83200003e330000423300004a330000ac3300005c3400004e3a0000503a0000523a0000543a0000563a0000583a0000ffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -571,7 +571,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000050290000502a00007c2a00005a2b0000d42b00002c2d0000882d0000c82d00002a2e0000422e00004c2e0000ee2e00003c300000aa300000ae310000e2310000bc32000010330000143300001c3300007e33000028340000cc390000ce390000d0390000d2390000d4390000d6390000
+    m_ExpandedIDs: 0000000050290000502a00007c2a00005c2b0000dc2b0000342d0000942d0000d42d0000382e0000502e00005a2e0000fe2e00004e300000c4300000d03100000c320000e83200003e330000423300004a330000ac3300005c3400004e3a0000503a0000523a0000543a0000563a0000583a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -596,8 +596,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 18350000
-    m_LastClickedInstanceID: 13592
+    m_SelectedInstanceIDs: 52350000
+    m_LastClickedInstanceID: 13650
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: 06520000000000005c2c0000
     m_RenameOverlay:
@@ -615,7 +615,7 @@ MonoBehaviour:
       m_IsRenaming: 0
       m_OriginalEventType: 11
       m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 13}
+      m_ClientGUIView: {fileID: 0}
     m_CreateAssetUtility:
       m_EndAction: {fileID: 0}
       m_InstanceID: 0

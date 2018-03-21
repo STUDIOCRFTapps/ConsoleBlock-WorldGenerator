@@ -266,7 +266,7 @@ namespace OTNM.Tools {
 			return Value.x;
 		}
 
-		public static Vector3 GetUberNoise(Vector2 p, FastNoise noise, int seed, 
+		public static float GetUberNoise(Vector2 p, FastNoise noise, int seed, 
 			int lOctaves,
 			//float lPerturbFeatures,
 			float lSharpness,
@@ -280,10 +280,10 @@ namespace OTNM.Tools {
 			//Type: Value from -1 (Rigged) to 1 (Billow)
 			//Original noise values are ranging from -1 to 1
 
-			Vector3 sum = Vector3.Zero;
+			float sum = 0.0f;
 			float freq = 1.0f, amp = 1.0f, damp = 1.0f;
 			Vector2 dsum = new Vector2(0,0);
-			Vector2 rdsum = new Vector2(0,0);
+			Vector2 rdsum = new Vector2(0,0); //ridge erosion derivative sum
 
 			for(int i = 0; i < lOctaves; i++) {
 				Vector3 nround = GetDerivativePerlinNoise(p*freq,noise,seed+i);
@@ -300,17 +300,15 @@ namespace OTNM.Tools {
 				n = Vector3.Lerp(nround,nsharp,lSharpness);
 
 				dsum += new Vector2(n.y*lSlopeErosion,n.z*lSlopeErosion);
-				sum.x += damp * n.x / (1 + Vector2.Dot(dsum, dsum));
-
-				sum.y += n.y*amp;
-				sum.z += n.z*amp;
-				sum.y *= 0.5f;
-				sum.z *= 0.5f;
+				rdsum += new Vector2(nsharp.y*lRidgeErosion,nsharp.z*lRidgeErosion);
+				sum += damp * n.x / (1 + Vector2.Dot(dsum, dsum));
 
 				freq *= lLacunarity;
-				amp *= MathFunc.Lerp(lGain, lGain * MathFunc.SmoothStep(0.0f,1.0f,sum.x), lAltitudeErosion);
-				damp = amp * (1.0f - (lRidgeErosion / (1.0f + Vector2.Dot(rdsum,rdsum))));
-				lGain += lFeaturesAmplifier;
+				amp *= MathFunc.Lerp(lGain, lGain * MathFunc.SmoothStep(0.0f,1.0f,sum), lAltitudeErosion);
+				damp = amp;// * (1.0f - (lRidgeErosion / (1.0f + Vector2.Dot(rdsum,rdsum))));
+				if(i==lOctaves-2) {
+					lGain += lFeaturesAmplifier;
+				}
 			}
 
 			return sum;
