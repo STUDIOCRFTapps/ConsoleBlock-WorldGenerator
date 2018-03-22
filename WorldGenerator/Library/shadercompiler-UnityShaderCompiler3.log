@@ -1,12 +1,25 @@
 Base path: /Applications/Unity/Unity.app/Contents
 Cmd: initializeCompiler
-Cmd: compileSnippet
-  api=14 type=0 insize=4204 outsize=7527 kw=POINT pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME ok=1
-Cmd: disassembleShader
-  api=14 insize=7527 outsize=7511 ok=1
-Cmd: compileSnippet
-  api=14 type=1 insize=4204 outsize=647 kw=POINT pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA UNITY_LIGHT_PROBE_PROXY_VOLUME ok=1
-Cmd: disassembleShader
-  api=14 insize=647 outsize=631 ok=1
+Cmd: translateComputeKernel
+  api=14 insize=6581 outsize=1537 ok=1
+Cmd: translateComputeKernel
+  api=14 insize=7433 outsize=3529 ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
 
 Quitting shader compiler process

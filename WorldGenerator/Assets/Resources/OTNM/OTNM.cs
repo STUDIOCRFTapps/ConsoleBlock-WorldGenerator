@@ -5,6 +5,13 @@ using XnaGeometry;
 using FastNoiseLibrary;
 
 namespace OTNM {
+    [Serializable]
+    public class OctaveParameters
+    {
+        public float FeatureAmplifierMin = 0f;
+        public float FeatureAmplifierMax = 0.09f;
+        public float FeatureAmplifierFreq = 0.09f;
+    }
 	public class TerrainNoiseGroup {
 		List<TerrainNoise> TerrainNoises;
 
@@ -270,7 +277,7 @@ namespace OTNM.Tools {
 			int lOctaves,
 			//float lPerturbFeatures,
 			float lSharpness,
-			float lFeaturesAmplifier,
+            float[] loctparams,
 			float lAltitudeErosion,
 			float lRidgeErosion,
 			float lSlopeErosion,
@@ -281,7 +288,7 @@ namespace OTNM.Tools {
 			//Original noise values are ranging from -1 to 1
 
 			float sum = 0.0f;
-			float freq = 1.0f, amp = 1.0f, damp = 1.0f;
+            float freq = 1.0f, amp = 1.0f, damp = 1.0f;
 			Vector2 dsum = new Vector2(0,0);
 			Vector2 rdsum = new Vector2(0,0); //ridge erosion derivative sum
 
@@ -301,14 +308,17 @@ namespace OTNM.Tools {
 
 				dsum += new Vector2(n.y*lSlopeErosion,n.z*lSlopeErosion);
 				rdsum += new Vector2(nsharp.y*lRidgeErosion,nsharp.z*lRidgeErosion);
-				sum += damp * n.x / (1 + Vector2.Dot(dsum, dsum));
+                sum += damp * n.x / (1 + Vector2.Dot(dsum, dsum));
+				/*if(i==0) {
+					sum -= MathFunc.Lerp(0f,0.3f,MathFunc.Pow(sum,2));
+				}*/
 
 				freq *= lLacunarity;
-				amp *= MathFunc.Lerp(lGain, lGain * MathFunc.SmoothStep(0.0f,1.0f,sum), lAltitudeErosion);
+                amp *= MathFunc.Lerp(lGain, lGain * MathFunc.SmoothStep(0.0f,1.0f,sum), lAltitudeErosion)*loctparams[i];
 				damp = amp;// * (1.0f - (lRidgeErosion / (1.0f + Vector2.Dot(rdsum,rdsum))));
-				if(i==lOctaves-2) {
+				/*if(i==lOctaves-2) {
 					lGain += lFeaturesAmplifier;
-				}
+				}*/
 			}
 
 			return sum;

@@ -47,7 +47,7 @@ public class Chunk {
 		MeshTemplate = mesh;
 		worldM = wm;
 
-		PrepareChunkHeightMap(blockSize,new Vector2(MainChunkPosition.x*SimulatedChunkSize,MainChunkPosition.y*SimulatedChunkSize));
+		//PrepareChunkHeightMap(blockSize,new Vector2(MainChunkPosition.x*SimulatedChunkSize,MainChunkPosition.y*SimulatedChunkSize));
 
 		LowestY = Mathf.Infinity;
 	}
@@ -78,9 +78,9 @@ public class Chunk {
 	Vector3 TokenPos;
 
 	public void ReconditionMesh (Vector2 Position, int blockSize, bool CreateCollider) {
-		if(ChunkObject == null) {
+		/*if(ChunkObject == null) {
 			return;
-		}
+		}*/
 		BlockSize = blockSize;
 		WaterBlockSize = Mathf.Clamp(BlockSize*2,1,16);
 		MainChunkPosition = Position;

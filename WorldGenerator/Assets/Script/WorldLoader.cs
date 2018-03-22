@@ -11,6 +11,8 @@ using UnityEngine.UI;
 
 public class WorldLoader : MonoBehaviour {
 
+	public WorldParameters UniversalWorldParameters;
+
 	public float BiomeTransitionSmoothing = 0.00185f;
 
 	[HideInInspector]
@@ -46,6 +48,7 @@ public class WorldLoader : MonoBehaviour {
 	public WorldTexture[] worldTextures;
 	public Biome[] biomes;
 	public SubBiome[] subBiome;
+	bool worldinitialized = false;
 
 	List<Chunk> ChunkList;
 
@@ -106,8 +109,8 @@ public class WorldLoader : MonoBehaviour {
 
 				if(Distance < LOD4EndChunkDistance) {
 					ChunkList.Insert(0,new Chunk(new Vector2(NewChunkPos.x+x,NewChunkPos.y+y),DistanceToLOD(Distance),SimulatedChunkSize,worldTextures,worldManager,MeshTemplate,false));
-					ChunkList[0].PrepareGeneration();
-					ChunkList[0].GenerateWorldObject();
+					//ChunkList[0].PrepareGeneration();
+					//ChunkList[0].GenerateWorldObject();
 				}
 			}
 		}
@@ -198,7 +201,8 @@ public class WorldLoader : MonoBehaviour {
 			NewChunkPos = new Vector2(Mathf.Floor(Player.position.x/SimulatedChunkSize),Mathf.Floor(Player.position.z/SimulatedChunkSize));
 		}
 
-		if(((Mathf.Abs(OldChunkPos.x - NewChunkPos.x) + Mathf.Abs(OldChunkPos.y - NewChunkPos.y)) > 2)) {
+		if(((Mathf.Abs(OldChunkPos.x - NewChunkPos.x) + Mathf.Abs(OldChunkPos.y - NewChunkPos.y)) > 2) || !worldinitialized) {
+			worldinitialized = true;
 			StartCoroutine(PrepareChunkLoading());
 		}
 		if(RequiredChunkList.Count > 0 && !IsPreparingChunkLoading) {
@@ -308,7 +312,9 @@ public class WorldLoader : MonoBehaviour {
 			if(!IsRequired) {
 				float Distance = Vector2.Distance(NewChunkPos,ChunkList[l].MainChunkPosition);
 
-				ChunkList[l].ChunkObject.SetActive(false);
+				if(ChunkList[l].ChunkObject!=null) {
+					ChunkList[l].ChunkObject.SetActive(false);
+				}	
 				GarbadgeChunkList.Add(new ChunkRequirementParameters(ChunkList[l].MainChunkPosition,Distance,0));
 			}
 		}
@@ -318,10 +324,12 @@ public class WorldLoader : MonoBehaviour {
 		for(int i = 0; i < RequiredChunkList.Count; i++) {
 			bool deleteUpgrade = false;
 			for(int l = 0; l < ChunkList.Count; l++) {
-				if(RequiredChunkList[deleteIndex].Position == ChunkList[l].MainChunkPosition && RequiredChunkList[deleteIndex].LOD == ChunkList[l].GetLODLevel() && ChunkList[l].ChunkObject.activeInHierarchy) {
-					RequiredChunkList.RemoveAt(deleteIndex);
-					deleteUpgrade = true;
-					break;
+				if(ChunkList[l].ChunkObject!=null) {
+					if(RequiredChunkList[deleteIndex].Position == ChunkList[l].MainChunkPosition && RequiredChunkList[deleteIndex].LOD == ChunkList[l].GetLODLevel() && ChunkList[l].ChunkObject.activeInHierarchy) {
+						RequiredChunkList.RemoveAt(deleteIndex);
+						deleteUpgrade = true;
+						break;
+					}
 				}
 			}
 			if(!deleteUpgrade) {

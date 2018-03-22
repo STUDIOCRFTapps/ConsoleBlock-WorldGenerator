@@ -10,6 +10,52 @@ using OTNM;
 using OTNM.Tools;
 using FastNoiseLibrary;
 
+[Serializable]
+public class WorldParameters {
+	public int Octaves = 8;
+
+	public float Frequency = 0.00f;
+	public float FrequencyFreq = 0.00212f;
+	public float FrequencyDistortionRange = 0.003f;
+	public float FrequencyDistortionFreq = 0.0034f;
+
+	public float FrequencyDistortion2Range = 0.0005f;
+	public float FrequencyDistortion2Freq = 0.0002f;
+
+	public float AmplitudeMin = 10f;
+	public float AmplitudeMax = 1800f;
+	public float AmplitudeFreq = 0.00001f;
+
+	public float LacunarityMin = 5f;
+	public float LacunarityMax = 10f;
+	public float LacunarityFreq = 0.00024f;
+
+	public float AltitudeErosionMin = 0.05f;
+	public float AltitudeErosionMax = 0.95f;
+	public float AltitudeErosionFreq = 0.00029f;
+
+	public float RidgeErosionMin = 0.8f;
+	public float RidgeErosionMax = 1.2f;
+	public float RidgeErosionFreq = 0.00031f;
+
+	public float SlopeErosionMin = 0.2f;
+	public float SlopeErosionMax = 1.2f;
+	public float SlopeErosionFreq = 0.00032f;
+
+	public float GainMin = 0.063f;
+	public float GainMax = 0.25f;
+	public float GainFreq = 0.00028f;
+
+	public float SharpnessMin = 0f;
+	public float SharpnessMax = 1f;
+	public float SharpnessFreq = 0.00005f;
+
+    public float HeightMin = -300f;
+    public float HeightMax = 400f;
+
+    public OctaveParameters[] OctavesParams;
+}
+
 //Manage the world by giving height (noise) and block (id) information, creating noise, giving water height information.
 public class WorldManager {
 
@@ -282,27 +328,32 @@ public class WorldManager {
 				bil = GetBiomesAt(x,y,1).infoList;
 				NaNError = biomes[bil[0]].name;
 			} else {
-				//Add min height
+                //Add min height
+                WorldParameters wp = creator.loader.UniversalWorldParameters;
+                float DistorsionX = Mathf.Lerp(-wp.FrequencyDistortionRange, wp.FrequencyDistortionRange, Mathf.PerlinNoise(x*wp.FrequencyDistortionFreq,y*wp.FrequencyDistortionFreq));
+                float DistorsionY = Mathf.Lerp(-wp.FrequencyDistortionRange, wp.FrequencyDistortionRange, Mathf.PerlinNoise(x*wp.FrequencyDistortionFreq+90,y*wp.FrequencyDistortionFreq+50));
+                float Distorsion2X = Mathf.Lerp(-wp.FrequencyDistortion2Range, wp.FrequencyDistortion2Range, Mathf.PerlinNoise(x*wp.FrequencyDistortion2Freq+DistorsionX,y*wp.FrequencyDistortion2Freq+DistorsionY));
+                float Distorsion2Y = Mathf.Lerp(-wp.FrequencyDistortion2Range, wp.FrequencyDistortion2Range, Mathf.PerlinNoise(x*wp.FrequencyDistortion2Freq+DistorsionX,y*wp.FrequencyDistortion2Freq+DistorsionY));
+                float Frequency = Mathf.Lerp(wp.Frequency+Distorsion2X, wp.Frequency+Distorsion2Y, Mathf.PerlinNoise(x*wp.FrequencyFreq,y*wp.FrequencyFreq));
 
-				float DistorsionX = Mathf.Lerp(-0.0003f, 0.0003f, Mathf.PerlinNoise(x*0.0034f,y*0.0034f));
-				float DistorsionY = Mathf.Lerp(-0.0003f, 0.0003f, Mathf.PerlinNoise(x*0.0034f,y*0.0034f));
-				float Distorsion2X = Mathf.Lerp(-0.0001f, 0.0001f, Mathf.PerlinNoise(x*0.00212f+DistorsionX,y*0.00212f+DistorsionY));
-				float Distorsion2Y = Mathf.Lerp(-0.0001f, 0.0001f, Mathf.PerlinNoise(x*0.00212f+DistorsionX,y*0.00212f+DistorsionY));
-				float Frequency = Mathf.Lerp(0.004f+Distorsion2X, 0.004f+Distorsion2Y, Mathf.PerlinNoise(x*0.00167f,y*0.00167f));
+                float Amplitude = Mathf.Lerp(wp.AmplitudeMin, wp.AmplitudeMax, Mathf.PerlinNoise(x*wp.AmplitudeFreq,y*wp.AmplitudeFreq));
+                float Lacunarity = Mathf.Lerp(wp.LacunarityMin, wp.LacunarityMax, Mathf.PerlinNoise(x*wp.LacunarityFreq,y*wp.LacunarityFreq));
 
-				float Amplitude = Mathf.Lerp(10, 1800, Mathf.PerlinNoise(x*0.00001f,y*0.00001f));
-				float Lacunarity = Mathf.Lerp(5f, 10f, Mathf.PerlinNoise(x*0.00024f,y*0.00024f));
+                float AltitudeErosion = Mathf.Lerp(wp.AltitudeErosionMin, wp.AltitudeErosionMax, Mathf.PerlinNoise(x*wp.AltitudeErosionFreq,y*wp.AltitudeErosionFreq));
+                float RidgeErosion = Mathf.Lerp(wp.RidgeErosionMin, wp.RidgeErosionMax, Mathf.PerlinNoise(x*wp.RidgeErosionFreq,y*wp.RidgeErosionFreq));
+                float SlopeErosion = Mathf.Lerp(wp.SlopeErosionMin, wp.SlopeErosionMax, Mathf.PerlinNoise(x*wp.SlopeErosionFreq,y*wp.SlopeErosionFreq));
 
-				float AltitudeErosion = Mathf.Lerp(0.05f, 0.95f, Mathf.PerlinNoise(x*0.00029f,y*0.00029f));
-				float RidgeErosion = Mathf.Lerp(0.8f, 1.2f, Mathf.PerlinNoise(x*0.00031f,y*0.00031f));
-				float SlopeErosion = Mathf.Lerp(0.2f, 1.2f, Mathf.PerlinNoise(x*0.00032f,y*0.00032f));
+                float Gain = Mathf.Lerp(wp.GainMin, wp.GainMax, Mathf.PerlinNoise(x*wp.GainFreq,y*wp.GainFreq));
 
-				float Gain = Mathf.Lerp(0.063f, 0.25f, Mathf.PerlinNoise(x*0.00028f,y*0.00028f));
+                float Sharpness = Mathf.Lerp(wp.SharpnessMin, wp.SharpnessMax, Mathf.SmoothStep(0,1f,Mathf.PerlinNoise(x*wp.SharpnessFreq,y*wp.SharpnessFreq)));
+                //float FeatureAmplifier = Mathf.Lerp(0f, 0.09f, Mathf.PerlinNoise(x*0.0043f,y*0.0043f));
 
-				float Sharpness = Mathf.Lerp(0f, 1f, Mathf.SmoothStep(0,1f,Mathf.PerlinNoise(x*0.00005f,y*0.00005f)));
-				float FeatureAmplifier = Mathf.Lerp(0f, 0.09f, Mathf.PerlinNoise(x*0.0043f,y*0.0043f));
+                float[] octfeatureamplifer = new float[8];
+                for(int i = 0; i < 8; i++) {
+                    octfeatureamplifer[i] = Mathf.Lerp(wp.OctavesParams[i].FeatureAmplifierMin,wp.OctavesParams[i].FeatureAmplifierMax,Mathf.PerlinNoise(x*wp.OctavesParams[i].FeatureAmplifierFreq,y*wp.OctavesParams[i].FeatureAmplifierFreq));
+                }
 
-				float n = OTNM.Tools.Accessing.GetUberNoise(new XnaGeometry.Vector2(x*Frequency,y*Frequency),fn,0,7,Sharpness,FeatureAmplifier,AltitudeErosion,RidgeErosion,SlopeErosion,Lacunarity,Gain)*Amplitude;
+                float n = OTNM.Tools.Accessing.GetUberNoise(new XnaGeometry.Vector2(x*Frequency,y*Frequency),fn,0,8,Sharpness,octfeatureamplifer,AltitudeErosion,RidgeErosion,SlopeErosion,Lacunarity,Gain)*Amplitude;
 				//XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetFractalNoiseWType(new XnaGeometry.Vector2(x*Frequency,y*Frequency),new Accessing.NoiseParameters(5,Lacunarity,Gain),fn,NoiseTypeValue)*Amplitude;
 
 
@@ -317,7 +368,7 @@ public class WorldManager {
 						temp[0] = Mathf.SmoothStep(hillMinHeight,hillMinHeight+hillMaxHeight+hillHeight,Mathf.InverseLerp(hillMinHeight,hillMinHeight+hillMaxHeight,temp[0]));
 					}
 				}*/
-				temp[0] = Mathf.Lerp(-700, 400, Mathf.PerlinNoise(x*0.000093f,y*0.000093f))+n;
+                temp[0] = Mathf.Lerp(wp.HeightMin, wp.HeightMax, Mathf.PerlinNoise(x*0.000093f,y*0.000093f))+n;
 				temp[1] = 0;
 
 				//temp = GetRawHeightMapBiomes(x,y,114);
