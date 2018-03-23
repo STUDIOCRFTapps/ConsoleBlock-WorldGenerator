@@ -106,10 +106,10 @@ MonoBehaviour:
     y: 30
     width: 1366
     height: 628
-  m_MinSize: {x: 681, y: 492}
-  m_MaxSize: {x: 14002, y: 14042}
+  m_MinSize: {x: 683, y: 492}
+  m_MaxSize: {x: 14004, y: 14042}
   vertical: 0
-  controlID: 60
+  controlID: 85
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_MinSize: {x: 406, y: 492}
   m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
-  controlID: 61
+  controlID: 86
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -260,8 +260,8 @@ MonoBehaviour:
     y: 0
     width: 369
     height: 628
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 277, y: 71}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 24}
   m_Panes:
   - {fileID: 24}
@@ -372,23 +372,23 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 5e510000
-    m_LastClickedID: 20830
-    m_ExpandedIDs: 4815e6fff4c1ffff00000000f24f0000
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: ecf9ffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: Cube
-      m_OriginalName: Cube
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: -1029582
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 8}
     m_SearchString: 
@@ -461,7 +461,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0.3311958, y: 0.64482003, z: -0.36593276, w: 0.5836178}
     speed: 2
-    m_Value: {x: 0.3311958, y: 0.64482003, z: -0.36593276, w: 0.5836178}
+    m_Value: {x: 0.33119577, y: 0.64482, z: -0.36593276, w: 0.5836178}
   m_Size:
     m_Target: 135.61229
     speed: 2
@@ -965,9 +965,9 @@ MonoBehaviour:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 54}
-    m_SelectedIDs: 184d0000
-    m_LastClickedID: 19736
-    m_ExpandedIDs: 000000008c4500007a460000aa460000da4600007c470000ea470000004800005a480000fe4800005e490000a2490000f44900001a4a0000c04a0000444b0000fe4b00006a4c0000184d0000644d00009a4d0000624e0000be4e0000c24e0000ca4e0000264f0000c04f00007e5200008052000082520000845200008652000088520000086400001e640000606400007464000092640000a4640000a6640000b4640000c4640000d2640000ffffff7f
+    m_SelectedIDs: a2190000
+    m_LastClickedID: 6562
+    m_ExpandedIDs: 00000000f00e0000321000006c100000b2100000821100008e110000341200007a12000006130000fe13000084140000ec140000661500009a1500007e1600002217000030180000c4180000a21900000c1a00001c1a0000581a00007e1b0000ee1b0000f21b0000fe1b0000861c0000681d0000dc430000de430000e0430000e2430000e4430000e6430000e8430000ea430000ec430000ee430000f0430000f2430000f4430000f6430000ffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -995,7 +995,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000008c4500007a460000aa4600007c470000ea470000fe4800005e490000a2490000f44900000c4a00001a4a0000c04a0000fe4b00006a4c0000644d00009a4d0000624e0000be4e0000c24e0000ca4e0000264f0000c04f00007e5200008052000082520000845200008652000088520000
+    m_ExpandedIDs: 00000000f00e0000321000006c100000b2100000821100008e110000341200007a12000006130000fe13000084140000ec140000661500009a1500007e1600002217000030180000c4180000a21900000c1a00001c1a0000581a00007e1b0000ee1b0000f21b0000fe1b0000861c0000681d0000dc430000de430000e0430000e2430000e4430000e6430000e8430000ea430000ec430000ee430000f0430000f2430000f4430000f6430000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
