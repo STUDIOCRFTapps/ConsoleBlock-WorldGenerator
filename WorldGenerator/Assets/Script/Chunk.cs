@@ -119,20 +119,40 @@ public class Chunk {
 			//Create new ones
 			for(int y = 0; y < SimulatedChunkSize; y++) {
 				for(int x = 0; x < SimulatedChunkSize; x++) {
-					int cbiome = 96;//worldM.GetBiomesAt(x + (MainChunkPosition.x * SimulatedChunkSize),y + (MainChunkPosition.y * SimulatedChunkSize),1).infoList[0];
+
+					//Structure generation: Get a list of every structures that are able to live in the region and randomize.
+
+					float t = 1f-worldM.GetTerrainTemperature(x,y);
+					float h = worldM.GetTerrainHumidity(x,y);
+
+					List<int> structureIdList = new List<int>();
+					for(int i = 0; i < worldM.creator.loader.Structures.Length; i++) {
+						if(h < worldM.creator.loader.Structures[i].HumidityValue+worldM.creator.loader.Structures[i].HumidityRange*3 &&
+						   h > worldM.creator.loader.Structures[i].HumidityValue-worldM.creator.loader.Structures[i].HumidityRange*3 &&
+						   t < worldM.creator.loader.Structures[i].TemperateValue+worldM.creator.loader.Structures[i].TemperateRange*3 &&
+						   t > worldM.creator.loader.Structures[i].TemperateValue-worldM.creator.loader.Structures[i].TemperateRange*3) {
+							structureIdList.Add(i);
+						}
+					}
+
+					if(structureIdList.Count == 0) {
+						return;
+					}
+
+					//int cbiome = 96;//worldM.GetBiomesAt(x + (MainChunkPosition.x * SimulatedChunkSize),y + (MainChunkPosition.y * SimulatedChunkSize),1).infoList[0];
 					float value = Mathf.PerlinNoise((x + (MainChunkPosition.x * SimulatedChunkSize)) * 1.128f,(y + (MainChunkPosition.y * SimulatedChunkSize)) * 1.128f);
 					Random.InitState(value.GetHashCode());
-					if(worldM.biomes[cbiome].Structures == null) {
-						continue;
-					}
-					int stcId = Random.Range(0,worldM.biomes[cbiome].Structures.Structures.Length);
-					if(value < worldM.biomes[cbiome].Structures.Structures[stcId].StructureFrequency) {
-						if(HeightMap[x / BlockSize,y / BlockSize]*BlockSize > worldM.biomes[cbiome].Structures.Structures[stcId].MinSpawningHeight && HeightMap[x / BlockSize,y / BlockSize]*BlockSize < worldM.biomes[cbiome].Structures.Structures[stcId].MaxSpawningHeight) {
-							int stcCode = Random.Range(0,worldM.biomes[cbiome].Structures.Structures[stcId].Objects.Length);
-							GameObject stc = (GameObject)GameObject.Instantiate(worldM.biomes[cbiome].Structures.Structures[stcId].Objects[stcCode],ChunkObject.transform.GetChild(0));
+					int stcId = Random.Range(0,structureIdList.Count);
+
+					if(value < worldM.creator.loader.Structures[
+						structureIdList[stcId]
+					].StructureFrequency) {
+						if(HeightMap[x / BlockSize,y / BlockSize]*BlockSize > worldM.creator.loader.Structures[structureIdList[stcId]].MinSpawningHeight && HeightMap[x / BlockSize,y / BlockSize]*BlockSize < worldM.creator.loader.Structures[structureIdList[stcId]].MaxSpawningHeight) {
+							int stcCode = Random.Range(0,worldM.creator.loader.Structures[structureIdList[stcId]].Objects.Length);
+							GameObject stc = (GameObject)GameObject.Instantiate(worldM.creator.loader.Structures[structureIdList[stcId]].Objects[stcCode],ChunkObject.transform.GetChild(0));
 							stc.transform.localPosition = new Vector3(x / BlockSize, HeightMap[x / BlockSize,y / BlockSize], y / BlockSize);
 							stc.transform.eulerAngles = Vector3.up * (Random.Range(0,4) * 90);
-							stc.transform.localScale = Vector3.one * Random.Range(worldM.biomes[cbiome].Structures.Structures[stcId].MinScaleModifRange,worldM.biomes[cbiome].Structures.Structures[stcId].MaxScaleModifRange) / BlockSize;
+							stc.transform.localScale = Vector3.one * Random.Range(worldM.creator.loader.Structures[structureIdList[stcId]].MinScaleModifRange,worldM.creator.loader.Structures[structureIdList[stcId]].MaxScaleModifRange) / BlockSize;
 						}
 					}
 				}

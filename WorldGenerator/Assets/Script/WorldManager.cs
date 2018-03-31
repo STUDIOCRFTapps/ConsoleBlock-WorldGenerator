@@ -387,7 +387,7 @@ public class WorldManager {
 			List<int> bil;
 			if(!creator.loader.DebuggingMode) {
 				bil = GetBiomesAt(x,y,1).infoList;
-				NaNError = biomes[bil[0]].name;
+				//NaNError = biomes[bil[0]].name;
 			} else {
                 //Add min height
                 WorldParameters wp = creator.loader.UniversalWorldParameters;
@@ -651,15 +651,15 @@ public class WorldManager {
 	}
 
 	public float GetTerrainTemperature (float x, float y) {
-		return creator.ReferenceFalloffY.Evaluate(y/8192f)+Mathf.PerlinNoise(x*0.01f,y*0.01f);
+		return creator.ReferenceFalloffY.Evaluate(y/8192f)+Mathf.PerlinNoise(x*0.01f,y*0.01f)*0.02f;
 	}
 
 	public float GetTerrainHumidity (float x, float y) {
 		WorldParameters wp = creator.loader.UniversalWorldParameters;
-		float Gain = Mathf.Lerp(wp.GainMin,wp.GainMax,Mathf.PerlinNoise(x * wp.GainFreq,y * wp.GainFreq));
-		float Amplitude = Mathf.Lerp(wp.AmplitudeMin, wp.AmplitudeMax, Mathf.PerlinNoise(x*wp.AmplitudeFreq,y*wp.AmplitudeFreq));
+		float Gain = Mathf.PerlinNoise(x * wp.GainFreq,y * wp.GainFreq);
+		float Amplitude = Mathf.PerlinNoise(x*wp.AmplitudeFreq,y*wp.AmplitudeFreq);
 
-		return Mathf.Lerp(0f,Amplitude,Gain)+Mathf.PerlinNoise(x * 0.01f,y * 0.01f);
+		return Mathf.Lerp(Gain,Amplitude,0.7f)+Mathf.PerlinNoise(x*0.011f,y*0.011f)*0.02f;
 	}
 
 	//Get the raw height at a certain position, gets the biome instead of searching it.

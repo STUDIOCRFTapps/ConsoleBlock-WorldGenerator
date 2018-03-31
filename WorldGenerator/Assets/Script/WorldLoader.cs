@@ -167,6 +167,8 @@ public class WorldLoader : MonoBehaviour {
 	Vector3 PlayerBlockPos;
 
 	void Update () {
+		DebugingText[0].text = worldManager.GetTerrainTemperature(Player.transform.position.x,Player.transform.position.z).ToString() + " : " + worldManager.GetTerrainHumidity(Player.transform.position.x,Player.transform.position.z).ToString();
+
 		//Debugging
 		if(!IsUpdatingCollision) {
 			StartCoroutine(UpdateCollision());
@@ -178,8 +180,8 @@ public class WorldLoader : MonoBehaviour {
 
 		//Water Physics Simulation (Temporary)
 		if(Player.transform.position.y < -17) {
-			PlayerBody.velocity += Vector3.up * 2.5f;
-			PlayerBody.velocity = new Vector3(PlayerBody.velocity.x,Mathf.Clamp(PlayerBody.velocity.y,Mathf.NegativeInfinity,40f),PlayerBody.velocity.z);
+			//PlayerBody.velocity = Vector3.up * 2.5f;
+			//PlayerBody.velocity = new Vector3(PlayerBody.velocity.x,Mathf.Clamp(PlayerBody.velocity.y,Mathf.NegativeInfinity,40f),PlayerBody.velocity.z);
 		}
 
 		PlayerBlockPos = new Vector3(Mathf.Floor(Player.transform.position.x),Mathf.Floor(Player.transform.position.y),Mathf.Floor(Player.transform.position.z));

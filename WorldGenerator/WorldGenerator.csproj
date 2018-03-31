@@ -425,6 +425,10 @@
     <Compile Include="Assets\Script\FpsTarget.cs" />
     <Compile Include="Assets\Script\MaterialOffseter.cs" />
     <Compile Include="Assets\Script\MeshBuilder.cs" />
+    <Compile Include="Assets\Script\ObjectBehaviour\Objects\ButtonScript.cs" />
+    <Compile Include="Assets\Script\ObjectBehaviour\WDataManager.cs" />
+    <Compile Include="Assets\Script\ObjectBehaviour\WInteractable.cs" />
+    <Compile Include="Assets\Script\ObjectBehaviour\WObject.cs" />
     <Compile Include="Assets\Script\ObjExporter.cs" />
     <Compile Include="Assets\Script\PrebakedBiomeDataKit.cs" />
     <Compile Include="Assets\Script\Structure.cs" />

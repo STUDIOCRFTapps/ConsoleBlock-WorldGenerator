@@ -187,6 +187,7 @@
 -define:CROSS_PLATFORM_INPUT
 -define:UNITY_POST_PROCESSING_STACK_V2
 'Assets/Art/Materials/UnitySkyboxShaders-master/Assets/Test/Misc/CameraMove.cs'
+'Assets/BattleTransitions/SimpleBlit.cs'
 'Assets/GrabberController.cs'
 'Assets/MenuUIManager.cs'
 'Assets/PostProcessing/Runtime/Attributes/GetSetAttribute.cs'
@@ -298,6 +299,10 @@
 'Assets/Script/FpsTarget.cs'
 'Assets/Script/MaterialOffseter.cs'
 'Assets/Script/MeshBuilder.cs'
+'Assets/Script/ObjectBehaviour/WDataManager.cs'
+'Assets/Script/ObjectBehaviour/WGIneractable.cs'
+'Assets/Script/ObjectBehaviour/WInteractable.cs'
+'Assets/Script/ObjectBehaviour/WObject.cs'
 'Assets/Script/ObjExporter.cs'
 'Assets/Script/PrebakedBiomeDataKit.cs'
 'Assets/Script/Structure.cs'
