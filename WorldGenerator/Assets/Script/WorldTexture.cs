@@ -6,7 +6,7 @@ public class WorldTexture : ScriptableObject {
 
 	new public string name = "";
 
-	public SubWorldTexture MainTexture;
+	public int MainTexture;
 	public TextureGroup[] TextureGroups;
 }
 
@@ -14,7 +14,7 @@ public class WorldTexture : ScriptableObject {
 public class TextureGroup {
 	public float MaxHeight = Mathf.Infinity;
 
-	public SubWorldTexture MainGroupTexture;
+	public int MainGroupTexture;
 	public PatchParameters patchs;
 }
 
@@ -24,5 +24,5 @@ public class PatchParameters {
 	public bool SeperatePatchs = true;
 	public float PatchScale = 0.05f;
 	public float PatchThreshold = 0.67f;
-	public SubWorldTexture PatchTexture;
+	public int PatchTexture;
 }

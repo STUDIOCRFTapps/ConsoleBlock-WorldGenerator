@@ -268,12 +268,27 @@ namespace OTNM.Tools {
 			return noise.GetSimplex(p.x,p.y);
 		}
 
+        public static float GetCellularNoise(Vector2 p, float Jitter, FastNoise noise, int seed = 0) {
+            noise.SetSeed(seed);
+            noise.SetCellularJitter(Jitter);
+            noise.SetCellularReturnType(FastNoise.CellularReturnType.Distance);
+            return noise.GetCellular(p.x, p.y);
+        }
+
 		public static float Erode (Vector3 Value) {
 			//return Value.x-=(MathFunc.Pow(MathFunc.Clamp(Math.Abs(Value.y)+Math.Abs(Value.z),0,2),3f)*12f);
 			return Value.x;
 		}
 
-		public static float GetUberNoise(Vector2 p, FastNoise noise, int seed, 
+		public static float GetLunarNoise(Vector2 p,float CraterSize,float CraterHeight,float CraterDepth,FastNoise noise,int seed = 0) {  //crater size: 0.86, crater height: 0.2, crater depth: 2.5
+			float n = MathFunc.InverseLerp(CraterSize,1f,MathFunc.Clamp((1f - OTNM.Tools.Accessing.GetCellularNoise(new XnaGeometry.Vector2(p.x,p.y),CraterSize,noise,seed)),CraterSize,1f)); //0.36
+			if (n > CraterHeight) {
+				n += (CraterHeight - n) * CraterDepth;
+			}
+			return n;
+		}
+
+		public static Vector3 GetUberNoise(Vector2 p, FastNoise noise, int seed, 
 			int lOctaves,
 			//float lPerturbFeatures,
 			float lSharpness,
@@ -282,13 +297,16 @@ namespace OTNM.Tools {
 			float lRidgeErosion,
 			float lSlopeErosion,
 			float lLacunarity,
-			float lGain
+			float lGain,
+		    float lGainKeeper
 		) {
 			//Type: Value from -1 (Rigged) to 1 (Billow)
 			//Original noise values are ranging from -1 to 1
 
 			float sum = 0.0f;
-            float freq = 1.0f, amp = 1.0f, damp = 1.0f;
+			float maxsum = 0.0f;
+            float freq = 1.0f, amp = 1.0f, damp = 1.0f, samp = 1.0f;
+			Vector2 slopesum = new Vector2(0,0);
 			Vector2 dsum = new Vector2(0,0);
 			Vector2 rdsum = new Vector2(0,0); //ridge erosion derivative sum
 
@@ -300,6 +318,7 @@ namespace OTNM.Tools {
 				nround.x = MathFunc.PingPong(nround.x-0.5f,1);
 				nround.y = MathFunc.PingPong(nround.y-0.5f,1);
 				nround.z = MathFunc.PingPong(nround.z-0.5f,1);
+
 				nsharp.x = MathFunc.PingPong(nsharp.x+0.5f,1);
 				nsharp.y = MathFunc.PingPong(nsharp.y+0.5f,1);
 				nsharp.z = MathFunc.PingPong(nsharp.z+0.5f,1);
@@ -308,20 +327,19 @@ namespace OTNM.Tools {
 
 				dsum += new Vector2(n.y*lSlopeErosion,n.z*lSlopeErosion);
 				rdsum += new Vector2(nsharp.y*lRidgeErosion,nsharp.z*lRidgeErosion);
-                sum += damp * n.x / (1 + Vector2.Dot(dsum, dsum));
-				/*if(i==0) {
-					sum -= MathFunc.Lerp(0f,0.3f,MathFunc.Pow(sum,2));
-				}*/
+                sum += amp * n.x / (1 + Vector2.Dot(dsum, dsum));
+
+				maxsum += 1f*lSlopeErosion*samp;
+				slopesum += new Vector2(n.y*2f-1f,n.z*2f-1f)*lSlopeErosion*samp;
 
 				freq *= lLacunarity;
+				samp *= MathFunc.Lerp(lGain,1f,lGainKeeper);
                 amp *= MathFunc.Lerp(lGain, lGain * MathFunc.SmoothStep(0.0f,1.0f,sum), lAltitudeErosion)*loctparams[i];
-				damp = amp;// * (1.0f - (lRidgeErosion / (1.0f + Vector2.Dot(rdsum,rdsum))));
-				/*if(i==lOctaves-2) {
-					lGain += lFeaturesAmplifier;
-				}*/
+				damp = amp * (1.0f - (lRidgeErosion / (1.0f + Vector2.Dot(rdsum,rdsum))));
 			}
+			slopesum /= maxsum;
 
-			return sum;
+			return new Vector3(sum,slopesum.x,slopesum.y);
 		}
 
 		public static float GetFractalNoise(Vector2 p, NoiseParameters noiseParameters, FastNoise noise, int seed = 0) {

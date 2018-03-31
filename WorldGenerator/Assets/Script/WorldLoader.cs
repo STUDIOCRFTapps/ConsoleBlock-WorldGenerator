@@ -12,6 +12,7 @@ using UnityEngine.UI;
 public class WorldLoader : MonoBehaviour {
 
 	public WorldParameters UniversalWorldParameters;
+	public Structure[] Structures;
 
 	public float BiomeTransitionSmoothing = 0.00185f;
 
@@ -46,11 +47,13 @@ public class WorldLoader : MonoBehaviour {
 	Vector2 NewChunkPos;
 
 	public WorldTexture[] worldTextures;
+	public SubWorldTexture[] subWorldTextures;
 	public Biome[] biomes;
 	public SubBiome[] subBiome;
 	bool worldinitialized = false;
 
 	List<Chunk> ChunkList;
+    int MaxChunkAllowed = 0;
 
 	//Lists made to match the new functions
 	List<ChunkRequirementParameters> GarbadgeChunkList = new List<ChunkRequirementParameters>();
@@ -88,7 +91,9 @@ public class WorldLoader : MonoBehaviour {
 	///
 
 	void Start () {
-		InitializeDatapaths();
+        if(!DebuggingMode) {
+            InitializeDatapaths();
+        }
 
 		//Initialize a bunch of stuff
 		NewChunkPos = new Vector2(Mathf.Floor(Player.position.x/SimulatedChunkSize),Mathf.Floor(Player.position.z/SimulatedChunkSize));
@@ -108,9 +113,10 @@ public class WorldLoader : MonoBehaviour {
 				float Distance = Vector2.Distance(Vector2.zero,new Vector2(x,y));
 
 				if(Distance < LOD4EndChunkDistance) {
-					ChunkList.Insert(0,new Chunk(new Vector2(NewChunkPos.x+x,NewChunkPos.y+y),DistanceToLOD(Distance),SimulatedChunkSize,worldTextures,worldManager,MeshTemplate,false));
+                    MaxChunkAllowed++;
+					/*ChunkList.Insert(0,new Chunk(new Vector2(NewChunkPos.x+x,NewChunkPos.y+y),DistanceToLOD(Distance),SimulatedChunkSize,worldTextures,worldManager,MeshTemplate,false));
 					//ChunkList[0].PrepareGeneration();
-					//ChunkList[0].GenerateWorldObject();
+					//ChunkList[0].GenerateWorldObject();*/
 				}
 			}
 		}
@@ -201,7 +207,11 @@ public class WorldLoader : MonoBehaviour {
 			NewChunkPos = new Vector2(Mathf.Floor(Player.position.x/SimulatedChunkSize),Mathf.Floor(Player.position.z/SimulatedChunkSize));
 		}
 
-		if(((Mathf.Abs(OldChunkPos.x - NewChunkPos.x) + Mathf.Abs(OldChunkPos.y - NewChunkPos.y)) > 2) || !worldinitialized) {
+		if(Input.GetKeyDown(KeyCode.R)) {
+			StartCoroutine(CleanUp());
+		}
+
+		if(((Mathf.Abs(OldChunkPos.x - NewChunkPos.x) + Mathf.Abs(OldChunkPos.y - NewChunkPos.y)) > 2) || !worldinitialized || Input.GetKeyDown(KeyCode.R)) {
 			worldinitialized = true;
 			StartCoroutine(PrepareChunkLoading());
 		}
@@ -209,6 +219,18 @@ public class WorldLoader : MonoBehaviour {
 			//Load a new chunk
 			StartCoroutine(LoadNextNewChunk());
 		}
+	}
+
+	IEnumerator CleanUp () {
+		yield return new WaitWhile(() => ActionRunning);
+
+		for(int i = 0; i < ChunkList.Count; i++) {
+			ChunkList[i].DestroyChunk();
+		}
+		ChunkList = new List<Chunk>();
+		GarbadgeChunkList = new List<ChunkRequirementParameters>();
+		RequiredChunkList = new List<ChunkRequirementParameters>();
+		OldRequiredChunkList = new List<ChunkRequirementParameters>();
 	}
 
 	//Collision Managing
@@ -257,8 +279,8 @@ public class WorldLoader : MonoBehaviour {
 
 
 	bool IsPreparingChunkLoading = false;
-	IEnumerator PrepareChunkLoading () {
-		if(IsPreparingChunkLoading) {
+	IEnumerator PrepareChunkLoading() {
+		if (IsPreparingChunkLoading) {
 			yield break;
 		} else {
 			IsPreparingChunkLoading = true;
@@ -276,74 +298,98 @@ public class WorldLoader : MonoBehaviour {
 		}*/
 
 		//Prepare what is require
-		for(int y = -Mathf.CeilToInt(LOD4EndChunkDistance); y <= Mathf.Ceil(LOD4EndChunkDistance); y++) {
-			for(int x = -Mathf.CeilToInt(LOD4EndChunkDistance); x <= Mathf.Ceil(LOD4EndChunkDistance); x++) {
-				float Distance = Vector2.Distance(Vector2.zero,new Vector2(x,y));
+		Action PrepareRequiredChunks = () => {
+			for (int y = -Mathf.CeilToInt(LOD4EndChunkDistance); y <= Mathf.Ceil(LOD4EndChunkDistance); y++) {
+				for (int x = -Mathf.CeilToInt(LOD4EndChunkDistance); x <= Mathf.Ceil(LOD4EndChunkDistance); x++) {
+					float Distance = Vector2.Distance(Vector2.zero,new Vector2(x,y));
 
-				if(Distance < LOD4EndChunkDistance) {
-					if(!ListContainsChunkType(RequiredChunkList,new ChunkRequirementParameters(new Vector2(NewChunkPos.x+x,NewChunkPos.y+y),0,DistanceToLOD(Distance)),0)) {
-						RequiredChunkList.Add(new ChunkRequirementParameters(new Vector2(NewChunkPos.x+x,NewChunkPos.y+y),Distance,DistanceToLOD(Distance)));
+					if (Distance < LOD4EndChunkDistance) {
+						if (!ListContainsChunkType(RequiredChunkList,new ChunkRequirementParameters(new Vector2(NewChunkPos.x + x,NewChunkPos.y + y),0,DistanceToLOD(Distance)),0)) {
+							RequiredChunkList.Add(new ChunkRequirementParameters(new Vector2(NewChunkPos.x + x,NewChunkPos.y + y),Distance,DistanceToLOD(Distance)));
+						}
 					}
 				}
 			}
-		}
 
-		//Sort the list in force order
-		RequiredChunkList.Sort(delegate(ChunkRequirementParameters c1, ChunkRequirementParameters c2) {
-			return c1.Force.CompareTo(c2.Force);
-		});
+			//Sort the list in force order
+			RequiredChunkList.Sort(delegate (ChunkRequirementParameters c1,ChunkRequirementParameters c2) {
+				return c1.Force.CompareTo(c2.Force);
+			});
+		};
 
-		if(RequiredChunkList.Count > ChunkList.Count) {
-			RequiredChunkList.RemoveRange(Mathf.Clamp(ChunkList.Count-1,0,RequiredChunkList.Count-1),Mathf.Clamp(RequiredChunkList.Count-1-ChunkList.Count-1,0,int.MaxValue));
-		}
+		Thread PrepareRequiredChunksThread = new Thread(new ThreadStart(PrepareRequiredChunks));
+		PrepareRequiredChunksThread.Start();
+		yield return new WaitUntil(() => !PrepareRequiredChunksThread.IsAlive);
 
-		yield return new WaitForSeconds(0.002f);
+		yield return null; //Wait for next chunks
 
+		List<bool> ToDesactivate = new List<bool>();
 
-		//Get a list of chunk to delete
-		GarbadgeChunkList = new List<ChunkRequirementParameters>();
-		for(int l = 0; l < ChunkList.Count; l++) {
-			bool IsRequired = false;
-			for(int i = 0; i < RequiredChunkList.Count; i++) {
-				if(ChunkList[l].MainChunkPosition == RequiredChunkList[i].Position) {
-					IsRequired = true;
+		Action PrepareGarbageChunks = () => {
+			//Get a list of chunk to delete
+			GarbadgeChunkList = new List<ChunkRequirementParameters>();
+			for(int l = 0; l < ChunkList.Count; l++) {
+				bool IsDesacitivated = false;
+				bool IsRequired = false;
+				for(int i = 0; i < RequiredChunkList.Count; i++) {
+					if (ChunkList[l].MainChunkPosition == RequiredChunkList[i].Position) {
+						IsRequired = true;
+					}
 				}
-			}
-			if(!IsRequired) {
-				float Distance = Vector2.Distance(NewChunkPos,ChunkList[l].MainChunkPosition);
+				if(!IsRequired) {
+					float Distance = Vector2.Distance(NewChunkPos,ChunkList[l].MainChunkPosition);
 
-				if(ChunkList[l].ChunkObject!=null) {
-					ChunkList[l].ChunkObject.SetActive(false);
-				}	
-				GarbadgeChunkList.Add(new ChunkRequirementParameters(ChunkList[l].MainChunkPosition,Distance,0));
+					if(ChunkList[l].ChunkObject != null) {
+						IsDesacitivated = true;
+					}
+					GarbadgeChunkList.Add(new ChunkRequirementParameters(ChunkList[l].MainChunkPosition,Distance,0));
+				}
+				ToDesactivate.Add(!IsDesacitivated);
 			}
+		};
+
+		Thread PrepareGarbageChunksThread = new Thread(new ThreadStart(PrepareGarbageChunks));
+		PrepareGarbageChunksThread.Start();
+		yield return new WaitUntil(() => !PrepareGarbageChunksThread.IsAlive);
+
+		List<bool> ChunkActive = new List<bool>();
+
+		for(int i = 0; i < ChunkList.Count; i++) {
+			ChunkList[i].ChunkObject.SetActive(ToDesactivate[i]);
+			ChunkActive.Add(ChunkList[i].ChunkObject.activeInHierarchy);
 		}
 
 		//Find what is already generated
-		int deleteIndex = 0;
-		for(int i = 0; i < RequiredChunkList.Count; i++) {
-			bool deleteUpgrade = false;
-			for(int l = 0; l < ChunkList.Count; l++) {
-				if(ChunkList[l].ChunkObject!=null) {
-					if(RequiredChunkList[deleteIndex].Position == ChunkList[l].MainChunkPosition && RequiredChunkList[deleteIndex].LOD == ChunkList[l].GetLODLevel() && ChunkList[l].ChunkObject.activeInHierarchy) {
-						RequiredChunkList.RemoveAt(deleteIndex);
-						deleteUpgrade = true;
-						break;
+		Action RemoveAlreadyGeneratedChunk = () => {
+			int deleteIndex = 0;
+			for(int i = 0; i < RequiredChunkList.Count; i++) {
+				bool deleteUpgrade = false;
+				for(int l = 0; l < ChunkList.Count; l++) {
+					if(ChunkList[l].ChunkObject != null) {
+						if(RequiredChunkList[deleteIndex].Position == ChunkList[l].MainChunkPosition && RequiredChunkList[deleteIndex].LOD == ChunkList[l].GetLODLevel() && ChunkActive[l]) {
+							RequiredChunkList.RemoveAt(deleteIndex);
+							deleteUpgrade = true;
+							break;
+						}
 					}
 				}
+				if(!deleteUpgrade) {
+					deleteIndex++;
+				}
 			}
-			if(!deleteUpgrade) {
-				deleteIndex++;
-			}
-		}
 
-		yield return new WaitForSeconds(0.002f);
+			//Sort the list in force order
+			GarbadgeChunkList.Sort(delegate (ChunkRequirementParameters c1,ChunkRequirementParameters c2) {
+				return c1.Force.CompareTo(c2.Force);
+			});
+			GarbadgeChunkList.Reverse();
+		};
 
-		//Sort the list in force order
-		GarbadgeChunkList.Sort(delegate(ChunkRequirementParameters c1, ChunkRequirementParameters c2) {
-			return c1.Force.CompareTo(c2.Force);
-		});
-		GarbadgeChunkList.Reverse();
+		Thread RemoveAlreadyGeneratedChunkThread = new Thread(new ThreadStart(RemoveAlreadyGeneratedChunk));
+		RemoveAlreadyGeneratedChunkThread.Start();
+		yield return new WaitUntil(() => !RemoveAlreadyGeneratedChunkThread.IsAlive);
+
+		yield return null;
 
 		IsPreparingChunkLoading = false;
 	}
@@ -373,18 +419,29 @@ public class WorldLoader : MonoBehaviour {
 
 		if(!UpdateOnly) {
 			if(GarbadgeChunkList.Count < 1) {
-				Debug.LogError("There's not enough chunk to recycle");
-				yield break;
-			}
-			for(int i = 0; i < ChunkList.Count; i++) {
-				if(GarbadgeChunkList[0].Position == ChunkList[i].MainChunkPosition) {
-					ChunkIndex = i;
-					break;
-				}
-			}
+                if(MaxChunkAllowed > ChunkList.Count) {
+                    ChunkList.Add(new Chunk(RequiredChunkList[0].Position, RequiredChunkList[0].LOD,SimulatedChunkSize, worldTextures, worldManager, MeshTemplate, false));
+                    ChunkIndex = -1;
+                    UpdateOnly = true;
+                } else {
+                    Debug.Log("There's not enough chunk to recycle.");
+                    yield break;
+                }
+            } else {
+                for(int i = 0; i < ChunkList.Count; i++) {
+                    if(GarbadgeChunkList[0].Position == ChunkList[i].MainChunkPosition) {
+                        ChunkIndex = i;
+                        break;
+                    }
+                }
+            }
 		}
-			
-		ChunkList[ChunkIndex].ReconditionMesh(RequiredChunkList[0].Position,RequiredChunkList[0].LOD,false);
+
+        if(ChunkIndex != -1) {
+            ChunkList[ChunkIndex].ReconditionMesh(RequiredChunkList[0].Position, RequiredChunkList[0].LOD, false);
+        } else {
+            ChunkIndex = ChunkList.Count - 1;
+        }
 
 		Action Generating = () => {
 			ChunkList[ChunkIndex].PrepareGeneration();

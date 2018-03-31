@@ -8,6 +8,9 @@ public class SubWorldTexture : ScriptableObject {
 	public Vector2[] Coords;
 	public int RepeatRange = 1;
 
+	public float SlopeThreshold = 35f;
+	public int SlopeSubTextureId = 0;
+
 	//public Vector2 TopCoords;
 	//public Vector2 UpperWallCoords;
 	//public Vector2 LowerWallCoords;

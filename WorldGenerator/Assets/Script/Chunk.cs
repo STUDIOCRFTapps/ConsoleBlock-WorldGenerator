@@ -47,7 +47,7 @@ public class Chunk {
 		MeshTemplate = mesh;
 		worldM = wm;
 
-		//PrepareChunkHeightMap(blockSize,new Vector2(MainChunkPosition.x*SimulatedChunkSize,MainChunkPosition.y*SimulatedChunkSize));
+		PrepareChunkHeightMap(blockSize,new Vector2(MainChunkPosition.x*SimulatedChunkSize,MainChunkPosition.y*SimulatedChunkSize));
 
 		LowestY = Mathf.Infinity;
 	}
@@ -97,36 +97,65 @@ public class Chunk {
 	}
 
 	public void GenerateTerrainModels () {
-		if(ChunkObject == null || HeightMap == null || HeightMap.GetLength(0) == 0) {
-			Debug.Log("Error while trying to generate terrain assest");
+		if(ChunkObject == null) {
+            Debug.Log("Error while trying to generate terrain assest: Missing Object");
 			return;
 		}
-		if(worldM.creator.loader.DebuggingMode) {
-			return;
-		}
+        if(HeightMap == null) {
+            Debug.Log("Error while trying to generate terrain assest: Missing Height Map");
+            return;
+        }
+        if(HeightMap.GetLength(0) == 0) {
+            Debug.Log("Error while trying to generate terrain assest: Empty Height Map");
+            return;
+        }
 
 		//Remove current assets
 		var children = new List<GameObject>();
 		foreach (Transform child in ChunkObject.transform.GetChild(0)) children.Add(child.gameObject);
 		children.ForEach(child => GameObject.Destroy(child));
 
-		//Create new ones
-		for(int y = 0; y < SimulatedChunkSize; y++) {
-			for(int x = 0; x < SimulatedChunkSize; x++) {
-				int cbiome = worldM.GetBiomesAt(x+(MainChunkPosition.x*SimulatedChunkSize),y+(MainChunkPosition.y*SimulatedChunkSize),1).infoList[0];
-				float value = Mathf.PerlinNoise((x+(MainChunkPosition.x*SimulatedChunkSize))*1.128f,(y+(MainChunkPosition.y*SimulatedChunkSize))*1.128f);
-				Random.InitState(value.GetHashCode());
-				if(worldM.biomes[cbiome].Structures == null) {
-					continue;
+		if(worldM.creator.loader.DebuggingMode) {
+			//Create new ones
+			for(int y = 0; y < SimulatedChunkSize; y++) {
+				for(int x = 0; x < SimulatedChunkSize; x++) {
+					int cbiome = 96;//worldM.GetBiomesAt(x + (MainChunkPosition.x * SimulatedChunkSize),y + (MainChunkPosition.y * SimulatedChunkSize),1).infoList[0];
+					float value = Mathf.PerlinNoise((x + (MainChunkPosition.x * SimulatedChunkSize)) * 1.128f,(y + (MainChunkPosition.y * SimulatedChunkSize)) * 1.128f);
+					Random.InitState(value.GetHashCode());
+					if(worldM.biomes[cbiome].Structures == null) {
+						continue;
+					}
+					int stcId = Random.Range(0,worldM.biomes[cbiome].Structures.Structures.Length);
+					if(value < worldM.biomes[cbiome].Structures.Structures[stcId].StructureFrequency) {
+						if(HeightMap[x / BlockSize,y / BlockSize]*BlockSize > worldM.biomes[cbiome].Structures.Structures[stcId].MinSpawningHeight && HeightMap[x / BlockSize,y / BlockSize]*BlockSize < worldM.biomes[cbiome].Structures.Structures[stcId].MaxSpawningHeight) {
+							int stcCode = Random.Range(0,worldM.biomes[cbiome].Structures.Structures[stcId].Objects.Length);
+							GameObject stc = (GameObject)GameObject.Instantiate(worldM.biomes[cbiome].Structures.Structures[stcId].Objects[stcCode],ChunkObject.transform.GetChild(0));
+							stc.transform.localPosition = new Vector3(x / BlockSize, HeightMap[x / BlockSize,y / BlockSize], y / BlockSize);
+							stc.transform.eulerAngles = Vector3.up * (Random.Range(0,4) * 90);
+							stc.transform.localScale = Vector3.one * Random.Range(worldM.biomes[cbiome].Structures.Structures[stcId].MinScaleModifRange,worldM.biomes[cbiome].Structures.Structures[stcId].MaxScaleModifRange) / BlockSize;
+						}
+					}
 				}
-				int stcId = Random.Range(0,worldM.biomes[cbiome].Structures.Structures.Length);
-				if(value < worldM.biomes[cbiome].Structures.Structures[stcId].StructureFrequency) {
-					if(HeightMap[x/BlockSize,y/BlockSize]*BlockSize > worldM.biomes[cbiome].Structures.Structures[stcId].MinSpawningHeight && HeightMap[x/BlockSize,y/BlockSize] < worldM.biomes[cbiome].Structures.Structures[stcId].MaxSpawningHeight) {
-						int stcCode = Random.Range(0,worldM.biomes[cbiome].Structures.Structures[stcId].Objects.Length);
-						GameObject stc = (GameObject)GameObject.Instantiate(worldM.biomes[cbiome].Structures.Structures[stcId].Objects[stcCode],ChunkObject.transform.GetChild(0));
-						stc.transform.localPosition = new Vector3(x/BlockSize,HeightMap[x/BlockSize,y/BlockSize],y/BlockSize);
-						stc.transform.eulerAngles = Vector3.up*(Random.Range(0,4)*90);
-						stc.transform.localScale = Vector3.one*Random.Range(worldM.biomes[cbiome].Structures.Structures[stcId].MinScaleModifRange,worldM.biomes[cbiome].Structures.Structures[stcId].MaxScaleModifRange)/BlockSize;
+			}
+		} else {
+			//Create new ones
+			for(int y = 0; y < SimulatedChunkSize; y++) {
+				for(int x = 0; x < SimulatedChunkSize; x++) {
+					int cbiome = worldM.GetBiomesAt(x + (MainChunkPosition.x * SimulatedChunkSize),y + (MainChunkPosition.y * SimulatedChunkSize),1).infoList[0];
+					float value = Mathf.PerlinNoise((x + (MainChunkPosition.x * SimulatedChunkSize)) * 1.128f,(y + (MainChunkPosition.y * SimulatedChunkSize)) * 1.128f);
+					Random.InitState(value.GetHashCode());
+					if(worldM.biomes[cbiome].Structures == null) {
+						continue;
+					}
+					int stcId = Random.Range(0,worldM.biomes[cbiome].Structures.Structures.Length);
+					if(value < worldM.biomes[cbiome].Structures.Structures[stcId].StructureFrequency) {
+						if(HeightMap[x / BlockSize,y / BlockSize] * BlockSize > worldM.biomes[cbiome].Structures.Structures[stcId].MinSpawningHeight && HeightMap[x / BlockSize,y / BlockSize] < worldM.biomes[cbiome].Structures.Structures[stcId].MaxSpawningHeight) {
+							int stcCode = Random.Range(0,worldM.biomes[cbiome].Structures.Structures[stcId].Objects.Length);
+							GameObject stc = (GameObject)GameObject.Instantiate(worldM.biomes[cbiome].Structures.Structures[stcId].Objects[stcCode],ChunkObject.transform.GetChild(0));
+							stc.transform.localPosition = new Vector3(x / BlockSize,HeightMap[x / BlockSize,y / BlockSize],y / BlockSize);
+							stc.transform.eulerAngles = Vector3.up * (Random.Range(0,4) * 90);
+							stc.transform.localScale = Vector3.one * Random.Range(worldM.biomes[cbiome].Structures.Structures[stcId].MinScaleModifRange,worldM.biomes[cbiome].Structures.Structures[stcId].MaxScaleModifRange) / BlockSize;
+						}
 					}
 				}
 			}
@@ -559,6 +588,7 @@ public class Chunk {
 			}
 
 			mw = cChunk.transform.GetChild(1).GetComponent<MeshFilter>();
+			cChunk.transform.GetChild(1).GetComponent<MeshRenderer>().enabled = true;
 			mw.transform.localScale = new Vector3((float)WaterBlockSize/BlockSize,(float)WaterBlockSize/BlockSize,(float)WaterBlockSize/BlockSize);
 			wMesh = new Mesh();
 			wMesh.SetVertices(WaterVerts);
@@ -644,7 +674,7 @@ public class Chunk {
 	}
 
 	int GetTextureTypeAtPixel (float x, float y, float Height) {
-		return worldM.GetTextureTypeAtPixel(x,y,BlockSize, Height);
+		return worldM.GetTextureTypeAtPixel(x,y,BlockSize,Height);
 	}
 
 	public static float GetValueAtPixelParams (float x, float y, WorldManager wm) {
@@ -659,7 +689,8 @@ public class Chunk {
 	int WorldTexture = 0;
 
 	SubWorldTexture GetSubWorldTexture (int x, int y, float Height) {
-		WorldTexture = worldM.GetTextureTypeAtPixel(x,y,BlockSize,Height);
+		return worldM.creator.loader.subWorldTextures[worldM.GetTextureTypeAtPixel(x,y,BlockSize,Height)];
+		/*WorldTexture = worldM.GetTextureTypeAtPixel(x,y,BlockSize,Height);
 		gr=-1;
 		for(int t = worldTextures[WorldTexture].TextureGroups.Length-1; t >= 0; t--) {
 			if(worldTextures[WorldTexture].TextureGroups[t].MaxHeight > Height*BlockSize) {
@@ -685,7 +716,7 @@ public class Chunk {
 			}
 		} else {
 			return worldTextures[WorldTexture].TextureGroups[gr].MainGroupTexture;
-		}
+		}*/
 	}
 
 	Vector2 vcalcule = Vector2.zero;

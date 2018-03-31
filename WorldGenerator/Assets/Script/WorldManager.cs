@@ -22,6 +22,9 @@ public class WorldParameters {
 	public float FrequencyDistortion2Range = 0.0005f;
 	public float FrequencyDistortion2Freq = 0.0002f;
 
+    public float FrequencyDistortion3Range = 0.0005f;
+    public float FrequencyDistortion3Freq = 0.0002f;
+
 	public float AmplitudeMin = 10f;
 	public float AmplitudeMax = 1800f;
 	public float AmplitudeFreq = 0.00001f;
@@ -52,6 +55,15 @@ public class WorldParameters {
 
     public float HeightMin = -300f;
     public float HeightMax = 400f;
+    public float HeightFreq = 0.00093f;
+
+    public float PlateauAmplThreshold = 0.1f;
+    public float PlateauGainThreshold = 0.1f;
+    public float PlateauHeight = 120f;
+    public float PlateauLenght = 3f;
+
+	public float SlopeThreshold = 30f;
+	public float SlopeGainKeeper = 0.5f;
 
     public OctaveParameters[] OctavesParams;
 }
@@ -124,105 +136,125 @@ public class WorldManager {
 		//Directory.CreateDirectory(Application.persistentDataPath + "/res/");
 		//File.WriteAllText(Application.persistentDataPath + "/res/bakedbiomedata.dat","HEya?");
 
-		if(creator.BakeData) {
-			BiomeFinderC.BiomeFinder = new BiomeInfoList[biomes.Length*8,biomes.Length*8];
-			for(int x = 0; x < biomes.Length*8; x++) {
-				for(int y = 0; y < biomes.Length*8; y++) {
-					float CT = (float)x/(biomes.Length*8);
-					float CH = (float)y/(biomes.Length*8);
+        if(false) {
+            if (creator.BakeData)
+            {
+                BiomeFinderC.BiomeFinder = new BiomeInfoList[biomes.Length * 8, biomes.Length * 8];
+                for (int x = 0; x < biomes.Length * 8; x++)
+                {
+                    for (int y = 0; y < biomes.Length * 8; y++)
+                    {
+                        float CT = (float)x / (biomes.Length * 8);
+                        float CH = (float)y / (biomes.Length * 8);
 
-					float BCurrentValue = 0f;
+                        float BCurrentValue = 0f;
 
-					float Temperature = 0f;
-					float Humidity = 0f;
+                        float Temperature = 0f;
+                        float Humidity = 0f;
 
-					float BClosestValue = Mathf.Infinity;
-					int BClosestId = 0;
+                        float BClosestValue = Mathf.Infinity;
+                        int BClosestId = 0;
 
-					List<float> ranks = new List<float>(){Mathf.Infinity,Mathf.Infinity,Mathf.Infinity};
-					List<int> ranksID = new List<int>(){0,0,0};
+                        List<float> ranks = new List<float>() { Mathf.Infinity, Mathf.Infinity, Mathf.Infinity };
+                        List<int> ranksID = new List<int>() { 0, 0, 0 };
 
-					int AimAt = 2;
-					int idv;
-					float dv;
+                        int AimAt = 2;
+                        int idv;
+                        float dv;
 
-					//Find a list with the 3 closest biome
-					//If a new value enter, the 4th one should be deleted, if it exist
+                        //Find a list with the 3 closest biome
+                        //If a new value enter, the 4th one should be deleted, if it exist
 
-					//Foreach biomes...
-					for(int b = 0; b < biomes.Length; b++) {
+                        //Foreach biomes...
+                        for (int b = 0; b < biomes.Length; b++)
+                        {
 
-						//Analize how similar the biome is to the environnement
-						Temperature = Distance(biomes[b].BiomeRequiredTemperature*0.01f,CT);
-						Humidity = Distance(biomes[b].BiomeRequiredHumidity*0.01f,CH);
-						BCurrentValue = Mathf.Lerp(Temperature,Humidity,0.5f)*(biomes[b].BiomeRarity*0.01f);
+                            //Analize how similar the biome is to the environnement
+                            Temperature = Distance(biomes[b].BiomeRequiredTemperature * 0.01f, CT);
+                            Humidity = Distance(biomes[b].BiomeRequiredHumidity * 0.01f, CH);
+                            BCurrentValue = Mathf.Lerp(Temperature, Humidity, 0.5f) * (biomes[b].BiomeRarity * 0.01f);
 
-						AimAt = -1;
-						idv = 0;
-						dv = 0f;
+                            AimAt = -1;
+                            idv = 0;
+                            dv = 0f;
 
-						for(int i = 2; i >= 0; i--) {
-							if(ranks.Count > i) {
-								if(ranks[i] >= BCurrentValue) {
-									AimAt = i;
-									idv = b;
-									dv = BCurrentValue;
-								}
-							} else {
-								AimAt = i;
-								idv = b;
-								dv = BCurrentValue;
-							}
-						}
+                            for (int i = 2; i >= 0; i--)
+                            {
+                                if (ranks.Count > i)
+                                {
+                                    if (ranks[i] >= BCurrentValue)
+                                    {
+                                        AimAt = i;
+                                        idv = b;
+                                        dv = BCurrentValue;
+                                    }
+                                }
+                                else
+                                {
+                                    AimAt = i;
+                                    idv = b;
+                                    dv = BCurrentValue;
+                                }
+                            }
 
-						if(AimAt != -1) {
-							ranks.Insert(Mathf.Clamp(AimAt,0,ranksID.Count),dv);
-							ranksID.Insert(Mathf.Clamp(AimAt,0,ranksID.Count),idv);
-						}
+                            if (AimAt != -1)
+                            {
+                                ranks.Insert(Mathf.Clamp(AimAt, 0, ranksID.Count), dv);
+                                ranksID.Insert(Mathf.Clamp(AimAt, 0, ranksID.Count), idv);
+                            }
 
-						if(ranks.Count >= 4) {
-							ranks.RemoveAt(3);
-						}
-						if(ranksID.Count >= 4) {
-							ranksID.RemoveAt(3);
-						}
+                            if (ranks.Count >= 4)
+                            {
+                                ranks.RemoveAt(3);
+                            }
+                            if (ranksID.Count >= 4)
+                            {
+                                ranksID.RemoveAt(3);
+                            }
 
-						/*if(BClosestValue > BCurrentValue) {
-							BClosestValue = BCurrentValue;
-							BClosestId = b;
-						}*/
-					}
+                            /*if(BClosestValue > BCurrentValue) {
+                                BClosestValue = BCurrentValue;
+                                BClosestId = b;
+                            }*/
+                        }
 
-					for(int v = 0; v < ranks.Count; v++) {
-						if(Distance(ranks[0],ranks[v]) > BiomeTransitionSmoothing+0.05f/*0.0073f*/) {
-							for(int v2 = v; v2 < 3; v2++) {
-								ranks.RemoveAt(ranks.Count-1);
-								ranksID.RemoveAt(ranksID.Count-1);
-							}
-							break;
-						}
-					}
+                        for (int v = 0; v < ranks.Count; v++)
+                        {
+                            if (Distance(ranks[0], ranks[v]) > BiomeTransitionSmoothing + 0.05f/*0.0073f*/)
+                            {
+                                for (int v2 = v; v2 < 3; v2++)
+                                {
+                                    ranks.RemoveAt(ranks.Count - 1);
+                                    ranksID.RemoveAt(ranksID.Count - 1);
+                                }
+                                break;
+                            }
+                        }
 
-					BiomeFinderC.BiomeFinder[x,y] = new BiomeInfoList();
-					for(int d = 0; d < ranksID.Count; d++) {
-						BiomeFinderC.BiomeFinder[x,y].infoList.Add(ranksID[d]);
-					}
-					//BiomeFinderC.BiomeFinder[x,y] = 
-					//BiomeFinderC.BiomeFinder[x,y].infoList.Add(new BiomeInfo(BClosestId,1f));
+                        BiomeFinderC.BiomeFinder[x, y] = new BiomeInfoList();
+                        for (int d = 0; d < ranksID.Count; d++)
+                        {
+                            BiomeFinderC.BiomeFinder[x, y].infoList.Add(ranksID[d]);
+                        }
+                        //BiomeFinderC.BiomeFinder[x,y] = 
+                        //BiomeFinderC.BiomeFinder[x,y].infoList.Add(new BiomeInfo(BClosestId,1f));
 
-					//NOTE: The total of the forces should be equal to 1,
-					//the biome should be classed by force (0 should be the biome with the most force)
+                        //NOTE: The total of the forces should be equal to 1,
+                        //the biome should be classed by force (0 should be the biome with the most force)
 
 
-				}
-			}
-			WriteBakedInformation(BiomeFinderC);
-			//File.WriteAllBytes(Application.dataPath + "/res/bakedbiomedata.dat", ec.ToArray());
-			//creator.prebakedBData.BiomeFinder = BiomeFinderC;
-		} else {
-			BiomeFinderC = ReadBakedInformation();
-			//BiomeFinderC = creator.prebakedBData.BiomeFinder;
-		}
+                    }
+                }
+                WriteBakedInformation(BiomeFinderC);
+                //File.WriteAllBytes(Application.dataPath + "/res/bakedbiomedata.dat", ec.ToArray());
+                //creator.prebakedBData.BiomeFinder = BiomeFinderC;
+            }
+            else
+            {
+                BiomeFinderC = ReadBakedInformation();
+                //BiomeFinderC = creator.prebakedBData.BiomeFinder;
+            }
+        }
 
 		//Prepare noise (from the libnoise library) and asing each noise with its correnspending Biome Id
 		for(int b = 0; b < biomes.Length; b++) {
@@ -316,6 +348,35 @@ public class WorldManager {
 
 	int Quality = 4;
 
+	int GetSubWorldTexture (int x, int y, int BlockSize, float Height, int WorldTextureID) {
+		int gr = -1;
+		for(int t = creator.loader.worldTextures[WorldTextureID].TextureGroups.Length - 1; t >= 0; t--) {
+			if(creator.loader.worldTextures[WorldTextureID].TextureGroups[t].MaxHeight > Height) {
+				gr = t;
+			}
+		}
+		if(gr == -1) {
+			return creator.loader.worldTextures[WorldTextureID].MainTexture;
+		}
+		if(creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.EnablePatchModule) {
+			if(creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.SeperatePatchs) {
+				if(Mathf.SmoothStep(0f,1f,Mathf.PerlinNoise(x * creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchScale,y * creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchScale)) > creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchThreshold) {
+					return creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchTexture;
+				} else {
+					return creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].MainGroupTexture;
+				}
+			} else {
+				if(Mathf.PerlinNoise(x * creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchScale,y * creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchScale) > creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchThreshold) {
+					return creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].patchs.PatchTexture;
+				} else {
+					return creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].MainGroupTexture;
+				}
+			}
+		} else {
+			return creator.loader.worldTextures[WorldTextureID].TextureGroups[gr].MainGroupTexture;
+		}
+	}
+
 	//Get the height at a certain position 
 	public float[] GetHeightMap(float x, float y) {
 
@@ -332,9 +393,14 @@ public class WorldManager {
                 WorldParameters wp = creator.loader.UniversalWorldParameters;
                 float DistorsionX = Mathf.Lerp(-wp.FrequencyDistortionRange, wp.FrequencyDistortionRange, Mathf.PerlinNoise(x*wp.FrequencyDistortionFreq,y*wp.FrequencyDistortionFreq));
                 float DistorsionY = Mathf.Lerp(-wp.FrequencyDistortionRange, wp.FrequencyDistortionRange, Mathf.PerlinNoise(x*wp.FrequencyDistortionFreq+90,y*wp.FrequencyDistortionFreq+50));
+
                 float Distorsion2X = Mathf.Lerp(-wp.FrequencyDistortion2Range, wp.FrequencyDistortion2Range, Mathf.PerlinNoise(x*wp.FrequencyDistortion2Freq+DistorsionX,y*wp.FrequencyDistortion2Freq+DistorsionY));
-                float Distorsion2Y = Mathf.Lerp(-wp.FrequencyDistortion2Range, wp.FrequencyDistortion2Range, Mathf.PerlinNoise(x*wp.FrequencyDistortion2Freq+DistorsionX,y*wp.FrequencyDistortion2Freq+DistorsionY));
-                float Frequency = Mathf.Lerp(wp.Frequency+Distorsion2X, wp.Frequency+Distorsion2Y, Mathf.PerlinNoise(x*wp.FrequencyFreq,y*wp.FrequencyFreq));
+                float Distorsion2Y = Mathf.Lerp(-wp.FrequencyDistortion2Range, wp.FrequencyDistortion2Range, Mathf.PerlinNoise(x*wp.FrequencyDistortion2Freq+DistorsionX+90,y*wp.FrequencyDistortion2Freq+DistorsionY+50));
+
+                float Distorsion3X = Mathf.Lerp(-wp.FrequencyDistortion3Range, wp.FrequencyDistortion3Range, Mathf.PerlinNoise(x * wp.FrequencyDistortion3Freq + Distorsion2X, y * wp.FrequencyDistortion3Freq + Distorsion2Y));
+                float Distorsion3Y = Mathf.Lerp(-wp.FrequencyDistortion3Range, wp.FrequencyDistortion3Range, Mathf.PerlinNoise(x * wp.FrequencyDistortion3Freq + Distorsion2X+90, y * wp.FrequencyDistortion3Freq + Distorsion2Y+50));
+
+                float Frequency = Mathf.Lerp(wp.Frequency+Distorsion3X, wp.Frequency+Distorsion3Y, Mathf.PerlinNoise(x*wp.FrequencyFreq,y*wp.FrequencyFreq));
 
                 float Amplitude = Mathf.Lerp(wp.AmplitudeMin, wp.AmplitudeMax, Mathf.PerlinNoise(x*wp.AmplitudeFreq,y*wp.AmplitudeFreq));
                 float Lacunarity = Mathf.Lerp(wp.LacunarityMin, wp.LacunarityMax, Mathf.PerlinNoise(x*wp.LacunarityFreq,y*wp.LacunarityFreq));
@@ -353,7 +419,27 @@ public class WorldManager {
                     octfeatureamplifer[i] = Mathf.Lerp(wp.OctavesParams[i].FeatureAmplifierMin,wp.OctavesParams[i].FeatureAmplifierMax,Mathf.PerlinNoise(x*wp.OctavesParams[i].FeatureAmplifierFreq,y*wp.OctavesParams[i].FeatureAmplifierFreq));
                 }
 
-                float n = OTNM.Tools.Accessing.GetUberNoise(new XnaGeometry.Vector2(x*Frequency,y*Frequency),fn,0,8,Sharpness,octfeatureamplifer,AltitudeErosion,RidgeErosion,SlopeErosion,Lacunarity,Gain)*Amplitude;
+				XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetUberNoise(new XnaGeometry.Vector2(x*Frequency,y*Frequency),fn,0,8,Sharpness,octfeatureamplifer,AltitudeErosion,RidgeErosion,SlopeErosion,Lacunarity,Gain,wp.SlopeGainKeeper)*Amplitude;
+
+				//TODO: PLATEAU CREATOR: 
+				/*if(Amplitude < Mathf.Lerp(wp.AmplitudeMin, wp.AmplitudeMax, wp.PlateauAmplThreshold)) {
+                    if(Gain < Mathf.Lerp(wp.GainMin, wp.GainMax, wp.PlateauGainThreshold)) {
+                        float PlateauIntensity = (
+                            1f-Mathf.InverseLerp(wp.AmplitudeMin, wp.PlateauAmplThreshold*wp.AmplitudeMax, Amplitude) +
+                            1f-Mathf.InverseLerp(wp.GainMin, wp.PlateauGainThreshold*wp.GainMax, Gain)
+                        )/2;
+
+                        PlateauIntensity = Mathf.Clamp(PlateauIntensity * wp.PlateauLenght, 0f, 1f);
+
+
+                        n += PlateauIntensity*wp.PlateauHeight;//PlateauIntensity * wp.PlateauHeight;
+                    }
+                }*/
+				//Amplitude: Low, Gain: Low, Lacunarity: Low
+				//          V
+				//Dig up the terrain bellow
+
+
 				//XnaGeometry.Vector3 n = OTNM.Tools.Accessing.GetFractalNoiseWType(new XnaGeometry.Vector2(x*Frequency,y*Frequency),new Accessing.NoiseParameters(5,Lacunarity,Gain),fn,NoiseTypeValue)*Amplitude;
 
 
@@ -368,9 +454,59 @@ public class WorldManager {
 						temp[0] = Mathf.SmoothStep(hillMinHeight,hillMinHeight+hillMaxHeight+hillHeight,Mathf.InverseLerp(hillMinHeight,hillMinHeight+hillMaxHeight,temp[0]));
 					}
 				}*/
-                temp[0] = Mathf.Lerp(wp.HeightMin, wp.HeightMax, Mathf.PerlinNoise(x*0.000093f,y*0.000093f))+n;
-				temp[1] = 0;
 
+				temp[0] = Mathf.Lerp(wp.HeightMin, wp.HeightMax, Mathf.PerlinNoise(x*wp.HeightFreq,y*wp.HeightFreq))+n.x;
+
+				//Get world texture ID, extract subtexture, check what other subtexture is called if the slope is over the threshold,
+				//return that SUB texture and make sure the chunck class handle the sub texture correctly instead of the world texture
+
+				int WorldTextureID = 9; //<----- How to control?!
+				if(GetTerrainHumidity(x,y) < 0.2f) {
+					//Dry
+					if(GetTerrainTemperature(x,y) < 0.2f) {
+						//Cold
+						WorldTextureID = 6;
+					} else if(GetTerrainTemperature(x,y) < 0.7f) {
+						//Normal
+						WorldTextureID = 16;
+					} else {
+						//Hot
+						WorldTextureID = 2;
+					}
+				} else if(GetTerrainHumidity(x,y) < 0.7f) {
+					//Normal
+					if(GetTerrainTemperature(x,y) < 0.2f) {
+						//Cold
+						WorldTextureID = 1;
+					} else if(GetTerrainTemperature(x,y) < 0.7f) {
+						//Normal
+						WorldTextureID = 9;
+					} else {
+						//Hot
+						WorldTextureID = 13;
+					}
+				} else {
+					//Wet
+					if(GetTerrainTemperature(x,y) < 0.2f) {
+						//Cold
+						WorldTextureID = 0;
+					} else if(GetTerrainTemperature(x,y) < 0.7f) {
+						//Normal
+						WorldTextureID = 13;
+					} else {
+						//Hot
+						WorldTextureID = 17;
+					}
+				}
+
+				//Humidity and Temperature?
+
+				int SubWorldTextureID = GetSubWorldTexture(Mathf.FloorToInt(x),Mathf.FloorToInt(y),1,temp[0],WorldTextureID);
+				if(creator.loader.subWorldTextures[SubWorldTextureID].SlopeThreshold*0.75f > Mathf.Abs(n.y) + Mathf.Abs(n.z)) {
+					temp[1] = creator.loader.subWorldTextures[SubWorldTextureID].SlopeSubTextureId;
+				} else {
+					temp[1] = SubWorldTextureID;
+				}
 				//temp = GetRawHeightMapBiomes(x,y,114);
 				//temp[0] = (temp[0]-Mathf.Repeat(temp[0],biomes[114].CanyonStepHeight))+(biomes[114].CanyonCurve.Evaluate(Mathf.Repeat(temp[0],biomes[114].CanyonStepHeight)/biomes[114].CanyonStepHeight)*biomes[114].CanyonStepHeight);
 				return temp;
@@ -512,6 +648,18 @@ public class WorldManager {
 			temp[0] = GetRawHeightMapBiomesModifier(x,y,total,bil[0])[0];//total;
 			return new float[2]{temp[0],temp[1]};
 		}
+	}
+
+	public float GetTerrainTemperature (float x, float y) {
+		return creator.ReferenceFalloffY.Evaluate(y/8192f)+Mathf.PerlinNoise(x*0.01f,y*0.01f);
+	}
+
+	public float GetTerrainHumidity (float x, float y) {
+		WorldParameters wp = creator.loader.UniversalWorldParameters;
+		float Gain = Mathf.Lerp(wp.GainMin,wp.GainMax,Mathf.PerlinNoise(x * wp.GainFreq,y * wp.GainFreq));
+		float Amplitude = Mathf.Lerp(wp.AmplitudeMin, wp.AmplitudeMax, Mathf.PerlinNoise(x*wp.AmplitudeFreq,y*wp.AmplitudeFreq));
+
+		return Mathf.Lerp(0f,Amplitude,Gain)+Mathf.PerlinNoise(x * 0.01f,y * 0.01f);
 	}
 
 	//Get the raw height at a certain position, gets the biome instead of searching it.
@@ -876,7 +1024,7 @@ public class WorldManager {
 	public float[,] GetWorldHeight (int chunkX, int chunkY, int blockInterval) {
 		string FileDirectory = creator.loader.WorldDirectoryPath + Path.DirectorySeparatorChar + (chunkX.ToString() + "_" + chunkY.ToString()) + ".cbc"; //cbc: ConsoleBlock Chunk
 
-		if(File.Exists(FileDirectory) && !creator.loader.DebuggingMode) {
+		if(File.Exists(FileDirectory)) {
 			byte[] feed = Decompress(File.ReadAllBytes(FileDirectory));
 			float[,] results = new float[creator.loader.SimulatedChunkSize/blockInterval+1,creator.loader.SimulatedChunkSize/blockInterval+1];
 
@@ -898,7 +1046,7 @@ public class WorldManager {
 					results[x,y] = GetHeightMap(chunkX*creator.loader.SimulatedChunkSize + x,chunkY*creator.loader.SimulatedChunkSize + y)[0];
 				}
 			}
-			SaveWorldHeight(chunkX,chunkY,results);
+			//SaveWorldHeight(chunkX,chunkY,results);
 			for(int x = 0; x < creator.loader.SimulatedChunkSize+blockInterval; x+=blockInterval) {
 				for(int y = 0; y < creator.loader.SimulatedChunkSize+blockInterval; y+=blockInterval) {
 					results2[x/blockInterval,y/blockInterval] = results[x,y]/blockInterval;
@@ -971,15 +1119,15 @@ public class WorldManager {
 
 	//Declaring a lock to prevent thread issues
 	private System.Object textureLock = new System.Object();
-	float Height = 0f;
+	//float Height = 0f;
 
 	//Get the block Id at a certain pos
 	public int GetTextureTypeAtPixel (float x, float y, int blockSize, float blockHeight) {
 		float[] temp = GetHeightMap(x,y);
-		if(blockHeight == 0 || blockHeight == null) {
+		/*if(blockHeight == 0) {
 			Height = temp[0]*blockSize;
 		}
-		Height = blockHeight*blockSize;
+		Height = blockHeight*blockSize;*/
 		return (int)temp[1];
 	}
 }
