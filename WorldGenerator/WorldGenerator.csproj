@@ -425,6 +425,7 @@
     <Compile Include="Assets\Script\FpsTarget.cs" />
     <Compile Include="Assets\Script\MaterialOffseter.cs" />
     <Compile Include="Assets\Script\MeshBuilder.cs" />
+    <Compile Include="Assets\Script\ObjectBehaviour\Objects\ButtonB.cs" />
     <Compile Include="Assets\Script\ObjectBehaviour\Objects\ButtonScript.cs" />
     <Compile Include="Assets\Script\ObjectBehaviour\WDataManager.cs" />
     <Compile Include="Assets\Script\ObjectBehaviour\WInteractable.cs" />

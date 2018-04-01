@@ -2,17 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WGIneractable : MonoBehaviour {
+public class ButtonScript : WInteractable {
+	WObjectOutput objectOutput;
 
-	WInteractable interactable;
+	bool ButtonDown = false;
+	bool ButtonPress = false;
+	bool ButtonUp = false;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	public new void OnInteraction () {
+		if(Input.GetMouseButtonDown(1)) {
+			ButtonDown = true;
+		}
+
+		if(Input.GetMouseButtonUp(1)) {
+			ButtonUp = true;
+		}
+
+		if(Input.GetMouseButton(1)) {
+			ButtonPress = true;
+		}
+
+		objectOutput.data.Add(new DataFragment(Name + ".IsButtonDown",ButtonDown));
+		objectOutput.data.Add(new DataFragment(Name + ".IsButtonUp",ButtonUp));
+		objectOutput.data.Add(new DataFragment(Name + ".IsButtonPress",ButtonPress));
+		objectOutput.OnPushRequested();
+
+		ButtonDown = false;
+		ButtonPress = false;
+		ButtonUp = false;
 	}
 }

@@ -1,15 +1,16 @@
 ﻿<Properties StartupConfiguration="{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/ObjectBehaviour/WGIneractable.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/ObjectBehaviour/Objects/ButtonB.cs">
     <Files>
       <File FileName="Assets/Script/WorldLoader.cs" Line="170" Column="23" />
       <File FileName="Assets/Script/Chunk.cs" Line="133" Column="117" />
       <File FileName="Assets/Script/WorldManager.cs" Line="662" Column="40" />
       <File FileName="Assets/Resources/OTNM/FastNoise/FastNoise.cs" Line="2151" Column="4" />
       <File FileName="Assets/Resources/OTNM/OTNM.cs" Line="338" Column="32" />
+      <File FileName="Assets/Script/ObjectBehaviour/Objects/ButtonScript.cs" Line="27" Column="42" />
       <File FileName="Assets/Script/ObjectBehaviour/WObject.cs" Line="11" Column="3" />
-      <File FileName="Assets/Script/ObjectBehaviour/WInteractable.cs" Line="8" Column="39" />
-      <File FileName="Assets/Script/ObjectBehaviour/WDataManager.cs" Line="14" Column="37" />
-      <File FileName="Assets/Script/ObjectBehaviour/WGIneractable.cs" Line="1" Column="1" />
+      <File FileName="Assets/Script/ObjectBehaviour/WInteractable.cs" Line="11" Column="3" />
+      <File FileName="Assets/Script/ObjectBehaviour/WDataManager.cs" Line="48" Column="24" />
+      <File FileName="Assets/Script/ObjectBehaviour/Objects/ButtonB.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
